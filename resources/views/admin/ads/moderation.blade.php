@@ -10,7 +10,7 @@
 
 @section("main")
     <link rel="stylesheet" href="{{asset('css/ads.css')}}">
-    <form action="">
+    <form action="" method="POST">
         <label>@lang('pages.ads_search')</label>
         <input type="text" name="search">
         <br>

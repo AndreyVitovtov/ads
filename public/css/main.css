@@ -23,6 +23,10 @@ body {
     animation: fade-in 0.1s linear; /* IE 10+, Fx 29+ */
 }
 
+.tac {
+    text-align: center;
+}
+
 .hidden {
     display: none;
 }

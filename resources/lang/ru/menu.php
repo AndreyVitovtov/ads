@@ -41,6 +41,10 @@ return [
     'subsections_add' => 'Добавить',
     'ads_moderation' => 'На модерации',
     'ads' => 'Объявления',
+    'moderators' => 'Модераторы',
+    'moderators_list' => 'Список',
+    'moderators_add' => 'Добавить',
+    'moderators_permissions' => 'Привилегии',
 
     'developer_admin_panel' => 'Админка',
     'developer_webhook' => 'Webhook',

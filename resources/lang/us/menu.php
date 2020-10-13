@@ -41,6 +41,10 @@ return [
     'subsections_add' => 'Add',
     'ads_moderation' => 'On moderation',
     'ads' => 'Ads',
+    'moderators' => 'Moderators',
+    'moderators_list' => 'List',
+    'moderators_add' => 'Add',
+    'moderators_permissions' => 'Permissions',
 
     'developer_admin_panel' => 'Admin panel',
     'developer_webhook' => 'Webhook',

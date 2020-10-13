@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\models\Role;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -47,5 +49,30 @@ class User extends Authenticatable
         ]);
 
         return $this;
+    }
+
+    public function role() {
+        return $this->belongsTo(Role::class,"roles_id");
+    }
+
+    public function hasRole($role) {
+        return $this
+            ->role()
+            ->where("name", $role)
+            ->exists();
+    }
+
+    public function hasPermission($perm) {
+        /*** @var Role $role */
+        $role = $this->role()->first();
+        if($role == null) return false;
+        return $role->permissions()->where("name",$perm)->exists();
+    }
+
+    public function getPermissions(): Collection {
+        /*** @var Role $role */
+        $role = $this->role()->first();
+        if($role == null) return new Collection();
+        return $role->permissions()->get();
     }
 }

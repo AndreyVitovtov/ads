@@ -175,7 +175,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        App\Providers\RefServiceProvider::class,
+        App\Providers\RolesProvider::class,
+        App\Providers\PermissionsProvider::class,
 
     ],
 

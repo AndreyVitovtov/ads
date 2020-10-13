@@ -9,6 +9,7 @@ use App\Services\Contracts\ContactService;
 use App\Services\Contracts\CountryService;
 use App\Services\Contracts\InteractionService;
 use App\Services\Contracts\LanguageService;
+use App\Services\Contracts\ModeratorsService;
 use App\Services\Contracts\PermissionService;
 use App\Services\Contracts\ReferralSystemService;
 use App\Services\Contracts\RoleService;
@@ -22,6 +23,7 @@ use App\Services\Implement\ContactServiceImpl;
 use App\Services\Implement\CountryServiceImpl;
 use App\Services\Implement\InteractionServiceImpl;
 use App\Services\Implement\LanguageServiceImpl;
+use App\Services\Implement\ModeratorsServiceImpl;
 use App\Services\Implement\PermissionServiceImpl;
 use App\Services\Implement\ReferralSystemImpl;
 use App\Services\Implement\RoleServiceImpl;
@@ -94,6 +96,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(UserService::class, function() {
             return new UserServiceImpl();
+        });
+
+        $this->app->singleton(ModeratorsService::class, function() {
+            return new ModeratorsServiceImpl();
         });
     }
 

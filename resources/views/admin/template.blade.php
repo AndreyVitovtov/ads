@@ -91,6 +91,7 @@
         </div>
         <ul class="sidebar-menu">
             <li class="header">@lang('template.left_panel_menu')</li>
+            @role('admin')
             @component('menu.menu-item', [
                 'name' => 'statistics',
                 'icon' => 'icon-gauge',
@@ -109,6 +110,7 @@
                 'menu' => 'mailing',
                 'url' => '/admin/mailing'])
             @endcomponent
+            @endrole
             @component('menu.menu-rolled', [
                 'nameItem' => 'countries',
                 'icon' => 'icon-map-2',
@@ -181,6 +183,26 @@
                        'name' => 'ads',
                        'menu' => 'ads',
                        'url' => '/admin/ads'
+                    ]
+                ]])
+            @endcomponent
+            @role('admin')
+            @component('menu.menu-rolled', [
+                'nameItem' => 'moderators',
+                'icon' => 'icon-users-2',
+                'name' => 'moderators',
+                'items' => [[
+                       'name' => 'moderators_list',
+                       'menu' => 'moderatorslist',
+                       'url' => '/admin/moderators'
+                    ],[
+                       'name' => 'moderators_add',
+                       'menu' => 'moderatorsadd',
+                       'url' => '/admin/moderators/add'
+                    ],[
+                       'name' => 'moderators_permissions',
+                       'menu' => 'moderatorspermissions',
+                       'url' => '/admin/moderators/permissions'
                     ]
                 ]])
             @endcomponent
@@ -283,6 +305,7 @@
                     ]
                 ]])
             @endcomponent
+            @endrole
         </ul>
     </section>
     <section class="content">

@@ -48,9 +48,11 @@ Route::get('bot/send/mailing', "Send@mailing"); // Рассылка (Кажды�
 Route::match(['get', 'post'], 'pay/handler', "Payment@handler");
 
 Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
-    Route::get('/', "Admin\Statistics@index");
+    Route::group(['middleware' => 'role:admin'], function() {
+        Route::get('/', "Admin\Statistics@index");
+    });
 
-    Route::prefix('/mailing')->group(function () {
+    Route::group(['prefix' => '/mailing', 'middleware' => 'role:admin'], function() {
         Route::get('/', "Admin\Mailing@index");
         Route::post('/send', "Admin\Mailing@send");
         Route::post('/cancel', "Admin\Mailing@cancel");
@@ -59,7 +61,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
         Route::post('/mark-inactive-users', "Admin\Mailing@markInactiveUsers");
     });
 
-    Route::prefix('users')->group(function () {
+    Route::group(['prefix' => '/users', 'middleware' => 'role:admin'], function() {
         Route::get('/', "Admin\Users@index");
         Route::get('/profile/{id}', "Admin\Users@profile");
         Route::get('/search', "Admin\Users@createUrlSearch");
@@ -116,14 +118,14 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
         Route::post('/go', "Admin\SubsectionsController@go")->name('subsections-go');
     });
 
-    Route::prefix('languages')->group(function() {
+    Route::group(['prefix' => '/languages', 'middleware' => 'role:admin'], function() {
         Route::get('/list', "Admin\Languages@list")->name('languages-list');
         Route::get('/add', "Admin\Languages@add")->name('languages-add');
         Route::post('/add/save', "Admin\Languages@addSave")->name('languages-add-save');
         Route::post('/delete', "Admin\Languages@delete")->name('languages-delete');
     });
 
-    Route::prefix('contacts')->group(function() {
+    Route::group(['prefix' => '/contacts', 'middleware' => 'role:admin'], function() {
         Route::get('/general', "Admin\Contacts@general")->name('contacts-general');
         Route::get('/access', "Admin\Contacts@access")->name('contacts-access');
         Route::get('/advertising', "Admin\Contacts@advertising")->name('contacts-advertising');
@@ -145,7 +147,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
         Route::post('/delete', "Admin\AdsController@delete")->name('ads-delete');
     });
 
-    Route::prefix('answers')->group(function () {
+    Route::group(['prefix' => '/answers', 'middleware' => 'role:admin'], function() {
         Route::get('/list', "Admin\Answers@list");
         Route::get('/add', "Admin\Answers@add");
         Route::post('/edit', "Admin\Answers@edit");
@@ -153,7 +155,17 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
         Route::post('/delete', "Admin\Answers@delete");
     });
 
-    Route::prefix('settings')->group(function () {
+    Route::group(['prefix' => '/moderators', 'middleware' => 'role:admin'], function() {
+        Route::get('/permissions', "Admin\Moderators@permissions")->name('moderators-permissions');
+        Route::get('/add', "Admin\Moderators@add")->name('moderators-add');
+        Route::post('/add/save', "Admin\Moderators@addSave")->name('moderators-save-add');
+        Route::get('/', "Admin\Moderators@list")->name('moderators-list');
+        Route::post('/edit', "Admin\Moderators@edit")->name('moderators-edit');
+        Route::post('/delete', "Admin\Moderators@delete")->name('moderators-delete');
+        Route::post('/edit/save', "Admin\Moderators@editSave")->name('moderators-save-edit');
+    });
+
+    Route::group(['prefix' => '/settings', 'middleware' => 'role:admin'], function() {
         Route::post('/', "Admin\Settings@admin");
         Route::post('/save', "Admin\Settings@adminUpdate");
         Route::get('/main', "Admin\Settings@main");
@@ -175,7 +187,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
         Route::get('/menu', "Admin\Add@menu")->name('add-menu');
     });
 
-    Route::prefix('/payment')->group(function () {
+    Route::group(['prefix' => '/payment', 'middleware' => 'role:admin'], function() {
         Route::get('/qiwi', "Admin\Payment@qiwi")->name('admin-qiwi');
         Route::post('/qiwi/save', "Admin\Payment@qiwiSave")->name('admin-qiwi-save');
         Route::get('/yandex', "Admin\Payment@yandex")->name('admin-yandex');
