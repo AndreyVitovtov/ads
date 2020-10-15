@@ -11,27 +11,33 @@
 @section("main")
     <link rel="stylesheet" href="{{asset('css/permissions.css')}}">
 
-    <form action="">
-    <table>
-        <tr>
-            <td>@lang('pages.moderators')</td>
-            @foreach($permissions as $permission)
-                <td>{{ $permission->name }}</td>
-            @endforeach
-        </tr>
-        @foreach($moderators as $moderator)
+    <form action="{{ route('moderators-save-permissions') }}" method="POST">
+        @csrf
+        <table>
             <tr>
-                <td>{{ $moderator->name }}</td>
+                <td>@lang('pages.moderators')</td>
                 @foreach($permissions as $permission)
-                    <td class="tac">
-                        <input type="checkbox" name="" >
-                    </td>
+                    <td>{{ $permission->name }}</td>
                 @endforeach
             </tr>
-        @endforeach
-    </table>
+            @foreach($moderators as $moderator)
+                <tr>
+                    <td>{{ $moderator->name }}</td>
+                    @foreach($permissions as $permission)
+                        <td class="tac">
+                            <input type="checkbox"
+                                   name="{{ $moderator->id }}_{{ $permission->id }}"
+                                   value="{{ $permission->id }}"
+                            @if($moderator->hasPermissionById($permission->id))
+                                checked
+                            @endif>
+                        </td>
+                    @endforeach
+                </tr>
+            @endforeach
+        </table>
         <br>
-        <input type="submit" value="@lang('pages.moderators-permissions-save')" class="button">
+        <input type="submit" value="@lang('pages.moderators_permissions_save')" class="button">
     </form>
 @endsection
 

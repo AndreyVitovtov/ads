@@ -18,4 +18,27 @@ class Admin extends Model {
     public function role() {
         return $this->belongsTo(Role::class, 'roles_id');
     }
+
+    public function permissions() {
+        return $this->belongsToMany(
+            Permission::class,
+            'admin_has_permissions',
+            'admin_id',
+            'permissions_id'
+        );
+    }
+
+    public function hasPermissionById($id) {
+        return $this->permissions()->where('id', $id)->exists();
+    }
+
+    public function hasPermission($permission) {
+        if(is_array($permission)) {
+            foreach($permission as $p) {
+                if($this->permissions()->where('name', $p)->exists()) return true;
+                return false;
+            }
+        }
+        return $this->permissions()->where('name', $permission)->exists();
+    }
 }

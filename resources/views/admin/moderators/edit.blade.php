@@ -15,20 +15,20 @@
         @csrf
         <input type="hidden" name="id" value="{{ $moderator->id }}">
         <div>
-            <label for="login">Логин:</label>
+            <label for="login">@lang('pages.moderators-add-login'):</label>
             <input type="text" name="login" value="{{ $moderator->login }}" id="login">
         </div>
         <div>
-            <label for="password">Пароль</label>
+            <label for="password">@lang('pages.moderators-add-new_password'):</label>
             <input type="password" name="password" id="password">
         </div>
         <div>
-            <label for="name">Имя</label>
+            <label for="name">@lang('pages.moderators-add-name'):</label>
             <input type="text" name="name" value="{{ $moderator->name }}" id="name">
         </div>
         <br>
         <div>
-            <input type="submit" value="Сохранить" class="button">
+            <input type="submit" value="@lang('pages.moderators_permissions_save')" class="button">
         </div>
     </form>
 @endsection

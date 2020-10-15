@@ -117,6 +117,17 @@ return [
 
     'log' => 'Last mailing log',
 
+    'moderators' => 'Moderators',
+    'moderators_actions' => 'Actions',
+    'moderators_add' => 'Add moderator',
+    'moderators-add-login' => 'Login',
+    'moderators-add-password' => 'Password',
+    'moderators-add-new_password' => 'New password',
+    'moderators-add-name' => 'Name',
+    'moderators-add-add' => 'Add',
+    'moderators_permissions' => 'Permissions',
+    'moderators_permissions_save' => 'Save',
+
     'languages_add' => 'Add language',
     'languages_list' => 'List of languages',
     'languages_name' => 'Name',

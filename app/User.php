@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\models\Permission;
 use App\models\Role;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\Notifiable;
@@ -63,10 +64,7 @@ class User extends Authenticatable
     }
 
     public function hasPermission($perm) {
-        /*** @var Role $role */
-        $role = $this->role()->first();
-        if($role == null) return false;
-        return $role->permissions()->where("name",$perm)->exists();
+        return $this->permissions()->where("name", $perm)->exists();
     }
 
     public function getPermissions(): Collection {
@@ -74,5 +72,9 @@ class User extends Authenticatable
         $role = $this->role()->first();
         if($role == null) return new Collection();
         return $role->permissions()->get();
+    }
+
+    public function permissions() {
+        return $this->belongsToMany(Permission::class, 'admin_has_permissions', 'admin_id', 'permissions_id');
     }
 }

@@ -25,7 +25,7 @@ class PermissionsProvider extends ServiceProvider
     public function boot()
     {
         Blade::directive("access", function($permission) {
-            return "<?php if(auth()->check() && auth()->user()->hasPermission({$permission})): ?>";
+            return "<?php if(auth()->check() && (auth()->user()->id === 1 || auth()->user()->hasPermission({$permission}))): ?>";
         });
 
         Blade::directive("endaccess", function() {

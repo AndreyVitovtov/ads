@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 class Statistics extends Controller {
 
     public function index () {
+
+
         $view = view('admin.statistics.statistics');
         $view->menuItem = "statistics";
 

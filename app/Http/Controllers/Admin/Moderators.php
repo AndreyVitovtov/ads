@@ -7,7 +7,9 @@ use App\models\Admin;
 use App\models\Permission;
 use App\Services\Contracts\ModeratorsService;
 use App\Services\Contracts\PermissionService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Moderators extends Controller {
 
@@ -23,7 +25,7 @@ class Moderators extends Controller {
 
     public function permissions() {
         return view('admin.moderators.permissions', [
-            'moderators' => Admin::all(),
+            'moderators' => $this->moderatorsService->all(),
             'permissions' => Permission::all(),
             'menuItem' => 'moderatorspermissions'
         ]);
@@ -63,6 +65,31 @@ class Moderators extends Controller {
     public function delete(Request $request) {
         $this->moderatorsService->delete($request->post('id'));
         return redirect()->to(route('moderators-list'));
+    }
+
+    public function permissionsSave(Request $request) {
+        $permissions = $request->input();
+        unset($permissions['_token']);
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('admin_has_permissions')->truncate();
+
+            foreach($permissions as $key => $perm) {
+                $up = explode('_', $key);
+
+                $moderator = Admin::find($up['0']);
+                $moderator->permissions()->attach($up[1]);
+            }
+
+            DB::commit();
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+        }
+
+        return redirect()->to(route('moderators-permissions'));
     }
 
 }

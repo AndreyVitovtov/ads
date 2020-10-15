@@ -116,6 +116,18 @@ return [
 
     'log' => 'Лог последней рассылки',
 
+    'moderators' => 'Модераторы',
+    'moderators_actions' => 'Действия',
+    'moderators_add' => 'Добавить модератора',
+    'moderators-add-login' => 'Логин',
+    'moderators-add-password' => 'Пароль',
+    'moderators-add-new_password' => 'Новый пароль',
+    'moderators-add-name' => 'Имя',
+    'moderators-add-add' => 'Добавить',
+    'moderators_permissions' => 'Привилегии',
+    'moderators_permissions_save' => 'Сохранить',
+    'moderators_edit' => 'Изменить модератора',
+
     'languages_add' => 'Добавить язык',
     'languages_list' => 'Список языков',
     'languages_name' => 'Название',

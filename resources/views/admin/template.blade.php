@@ -91,26 +91,31 @@
         </div>
         <ul class="sidebar-menu">
             <li class="header">@lang('template.left_panel_menu')</li>
-            @role('admin')
+            @access('statistics')
             @component('menu.menu-item', [
                 'name' => 'statistics',
                 'icon' => 'icon-gauge',
                 'menu' => 'statistics',
                 'url' => '/admin'])
             @endcomponent
+            @endaccess
+            @access('users')
             @component('menu.menu-item', [
                 'name' => 'users',
                 'icon' => 'icon-users-3',
                 'menu' => 'users',
                 'url' => '/admin/users'])
             @endcomponent
+            @endaccess
+            @access('mailing')
             @component('menu.menu-item', [
                 'name' => 'mailing',
                 'icon' => 'icon-mail-4',
                 'menu' => 'mailing',
                 'url' => '/admin/mailing'])
             @endcomponent
-            @endrole
+            @endaccess
+            @access('countries')
             @component('menu.menu-rolled', [
                 'nameItem' => 'countries',
                 'icon' => 'icon-map-2',
@@ -126,6 +131,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('cities')
             @component('menu.menu-rolled', [
                 'nameItem' => 'cities',
                 'icon' => 'icon-location-3',
@@ -141,6 +148,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('rubrics')
             @component('menu.menu-rolled', [
                 'nameItem' => 'rubrics',
                 'icon' => 'icon-th-large-outline',
@@ -156,6 +165,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('subsections')
             @component('menu.menu-rolled', [
                 'nameItem' => 'subsections',
                 'icon' => 'icon-th-outline',
@@ -171,6 +182,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('ads')
             @component('menu.menu-rolled', [
                 'nameItem' => 'ads',
                 'icon' => 'icon-docs-1',
@@ -186,7 +199,8 @@
                     ]
                 ]])
             @endcomponent
-            @role('admin')
+            @endaccess
+            @access('moderators')
             @component('menu.menu-rolled', [
                 'nameItem' => 'moderators',
                 'icon' => 'icon-users-2',
@@ -206,6 +220,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('languages')
             @component('menu.menu-rolled', [
                 'nameItem' => 'languages',
                 'icon' => 'icon-language-1',
@@ -221,6 +237,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('contacts')
             @component('menu.menu-rolled', [
                 'nameItem' => 'contacts',
                 'icon' => 'icon-book',
@@ -246,6 +264,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('answers')
             @component('menu.menu-rolled', [
                 'nameItem' => 'answers',
                 'icon' => 'icon-help-1',
@@ -261,6 +281,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('payment')
             @component('menu.menu-rolled', [
                 'nameItem' => 'payment',
                 'icon' => 'icon-money-2',
@@ -284,6 +306,8 @@
                     ]
                 ]])
             @endcomponent
+            @endaccess
+            @access('settings')
             @component('menu.menu-rolled', [
                 'nameItem' => 'settings',
                 'icon' => 'icon-cog-alt',
@@ -305,7 +329,7 @@
                     ]
                 ]])
             @endcomponent
-            @endrole
+            @endaccess
         </ul>
     </section>
     <section class="content">
