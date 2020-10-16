@@ -3,6 +3,8 @@
 namespace App\models\buttons;
 
 use App\models\BotUsers;
+use App\models\City;
+use App\models\Country;
 use App\models\Heading;
 use App\models\Khatma;
 use App\models\Language;
@@ -99,4 +101,86 @@ class InlineButtons {
 
         return $buttons;
     }
+
+    public static function languages() {
+        return "";
+    }
+
+
+    public static function countries($countries, $page) {
+        $count = Country::count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'select_countries__'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'select_countries__'.$pp
+        ];
+
+        $buttons = [];
+        foreach($countries as $country) {
+            $buttons[] = [[
+                'text' => $country->name,
+                'callback_data' => 'select_city__'.$country->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
+    public static function cities($cities, $countryId, $page) {
+        $count = City::where('country_id', $countryId)->count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'select_city__'.$countryId.'_'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'select_city__'.$countryId.'_'.$pp
+        ];
+
+        $buttons = [];
+        foreach($cities as $city) {
+            $buttons[] = [[
+                'text' => $city->name,
+                'callback_data' => 'selected_city__'.$city->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
 }

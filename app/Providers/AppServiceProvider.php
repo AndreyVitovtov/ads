@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\Contracts\AdminService;
 use App\Services\Contracts\AdService;
+use App\Services\Contracts\BotService;
 use App\Services\Contracts\CityService;
 use App\Services\Contracts\ContactService;
 use App\Services\Contracts\CountryService;
@@ -18,6 +19,7 @@ use App\Services\Contracts\SubsectionService;
 use App\Services\Contracts\UserService;
 use App\Services\Implement\AdminServiceImpl;
 use App\Services\Implement\AdServiceImpl;
+use App\Services\Implement\BotServiceImpl;
 use App\Services\Implement\CityServiceImpl;
 use App\Services\Implement\ContactServiceImpl;
 use App\Services\Implement\CountryServiceImpl;
@@ -100,6 +102,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ModeratorsService::class, function() {
             return new ModeratorsServiceImpl();
+        });
+
+        $this->app->singleton(BotService::class, function() {
+            return new BotServiceImpl();
         });
     }
 

@@ -99,8 +99,6 @@ class Settings extends Controller {
         $webhook = new Webhook();
         $webhook->set();
 
-        $webhook->setChatBot();
-
         return redirect()->to("/admin/settings/main");
     }
 

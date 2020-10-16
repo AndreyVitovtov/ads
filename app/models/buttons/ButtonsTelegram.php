@@ -12,8 +12,9 @@ class ButtonsTelegram {
 //        $user = BotUsers::find($userId);
 
         return [
-            ["{contacts}"],
-            ["{languages}"]
+            ["{search_ads}", "{create_ad}"],
+            ["{my_ads}", "{contacts}"],
+            ["{edit_country}"]
         ];
     }
 
@@ -27,6 +28,13 @@ class ButtonsTelegram {
     public function back() {
         return [
             ["{back}"]
+        ];
+    }
+
+    public function search_ads() {
+        return [
+            ["{by_title}", "{by_rubric}"],
+            ["{closest_to_me}", "{back}"]
         ];
     }
 }

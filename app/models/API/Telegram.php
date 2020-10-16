@@ -117,7 +117,7 @@ class Telegram {
             else {
                 $data['reply_markup'] = [
                     'inline_keyboard' => $params['inlineButtons'],
-                    'resize_keyboard' => true
+//                    'resize_keyboard' => true
                 ];
             }
         }
@@ -128,7 +128,7 @@ class Telegram {
             }
             else {
                 $data['reply_markup'] = [
-                    'hide_keyboard' => $params['hide_keyboard']
+                    'hide_keyboard' => $params['hideKeyboard']
                 ];
             }
         }

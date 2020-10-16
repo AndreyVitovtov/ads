@@ -21,20 +21,4 @@ class Webhook {
             $telegram->setWebhook($uri);
         }
     }
-
-    public function setChatBot() {
-        if(defined("VIBER_CHAT_TOKEN")) {
-            $uri = "https://".$_SERVER['HTTP_HOST']."/bot/chat";
-
-            $viber = new Viber(VIBER_CHAT_TOKEN);
-            $viber->setWebhook($uri);
-        }
-
-        if(defined("TELEGRAM_CHAT_TOKEN")) {
-            $uri = "https://".$_SERVER['HTTP_HOST']."/bot/chat";
-
-            $telegram = new Telegram(TELEGRAM_CHAT_TOKEN);
-            dd($telegram->setWebhook($uri));
-        }
-    }
 }

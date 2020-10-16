@@ -23,10 +23,8 @@ class BotUsers extends Model {
         'active',
         'start',
         'count_ref',
-        'count_read',
         'access_free',
-        'language',
-        'count_chats'
+        'language'
     ];
 
     public function chats() {
