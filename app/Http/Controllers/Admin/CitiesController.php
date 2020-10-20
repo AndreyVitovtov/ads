@@ -45,10 +45,11 @@ class CitiesController extends Controller {
         ]);
     }
 
-    public function add() {
+    public function add($id = null) {
         return view('admin.cities.add', [
             'countries' => $this->countryService->all(),
-            'menuItem' => 'citiesadd'
+            'menuItem' => 'citiesadd',
+            'id' => $id
         ]);
     }
 
@@ -56,7 +57,9 @@ class CitiesController extends Controller {
         $this->cityService->create($request->post('name'), $request->post('country_id'));
 
         if($request->post('add_more')) {
-            return redirect()->to(route('cities-add'));
+            return redirect()->to(route('cities-add', [
+                'id' => $request->post('country_id')
+            ]));
         }
         else {
             return redirect()->to(route('cities-country', [

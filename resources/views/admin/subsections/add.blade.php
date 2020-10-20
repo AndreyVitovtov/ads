@@ -18,7 +18,11 @@
                 <label for="select_country">@lang('pages.subsections_select_rubric')</label>
                 <select name="rubric_id" id="select_rubric">
                     @foreach($rubrics as $rubric)
-                        <option value="{{ $rubric->id }}">{{ $rubric->name }}</option>
+                        <option value="{{ $rubric->id }}"
+                            @if($rubric->id == $id)
+                                selected
+                            @endif
+                        >{{ $rubric->name }}</option>
                     @endforeach
                 </select>
                 <br>

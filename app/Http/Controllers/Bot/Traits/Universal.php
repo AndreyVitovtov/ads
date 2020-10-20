@@ -182,6 +182,7 @@ trait Universal {
                 'callback_query' => 'callback_query',
                 'channel_post' => 'channel_post',
                 'location' => 'location',
+                'contact' => 'contact',
                 'text' => 'text',
                 'document' => 'document',
                 'photo' => 'photo',
@@ -366,6 +367,11 @@ trait Universal {
                     'lon' => $request->message->location->longitude
                 ];
             }
+            elseif($this->type == "contact") {
+                $data = [
+                    'phone' => $request->message->contact->phone_number
+                ];
+            }
             else {
                 $data = [
                     'message_id' => $request->message->message_id,
@@ -470,6 +476,9 @@ trait Universal {
             }
             elseif($this->type == "location") {
                 return "location";
+            }
+            elseif($this->type == "contact") {
+                return "contact";
             }
             else {
                 return null;

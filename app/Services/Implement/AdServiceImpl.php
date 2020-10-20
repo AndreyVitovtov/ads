@@ -101,7 +101,7 @@ class AdServiceImpl implements AdService {
     }
 
     function getOnModerationPaginate(int $count) {
-        return Ad::with('rubric')->where('active', '0')->paginate($count);
+        return Ad::with('subsection')->where('active', '0')->paginate($count);
     }
 
     function getActivePaginate(int $count) {

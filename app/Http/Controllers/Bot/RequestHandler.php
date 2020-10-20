@@ -7,6 +7,7 @@ use App\models\BotUsers;
 use App\models\buttons\InlineButtons;
 use App\models\City;
 use App\models\Country;
+use Exception;
 
 class RequestHandler extends BaseRequestHandler {
 
@@ -60,7 +61,8 @@ class RequestHandler extends BaseRequestHandler {
             $res = $this->send("{select_city}", [
                 'inlineButtons' => InlineButtons::cities(
                     $this->botService->getCitiesByCountry($countryId, $page, 10),
-                    $countryId, $page
+                    $countryId,
+                    $page
                 ),
                 'hideKeyboard' => true
             ]);
@@ -145,8 +147,42 @@ class RequestHandler extends BaseRequestHandler {
         ]);
     }
 
-    public function by_rubric() {
+    public function by_rubric($page = 1) {
+        $page = (int) $page;
+        $this->delInteraction();
+
         $this->send('{select_rubric}', [
+            'buttons' => $this->buttons()->back()
+        ]);
+
+        $this->send('{rubrics}', [
+            'inlineButtons' => InlineButtons::searchAdsByRubric(
+                $this->botService->getRubrics($page, 10),
+                $page
+            )
+        ]);
+    }
+
+    public function by_rubric_subsection($data) {
+        if(is_array($data)) {
+            $rubricId = $data[0];
+            $page = $data[1];
+        }
+        else {
+            $rubricId = $data;
+            $page = 1;
+        }
+        $this->send('{select_subsection}', [
+            'inlineButtons' => InlineButtons::searchAdsByRubricSubsection(
+                $this->botService->getSubsectionsByRubric($rubricId, $page, 10),
+                $rubricId,
+                $page
+            )
+        ]);
+    }
+
+    public function by_rubric_subsection_selected($subsectionId) {
+        $this->send($subsectionId, [
             'buttons' => $this->buttons()->back()
         ]);
     }
@@ -159,16 +195,166 @@ class RequestHandler extends BaseRequestHandler {
         $this->select_country();
     }
 
-    public function create_ad() {
+    public function create_ad($page = 1) {
+        $page = (int) $page;
         $this->send('{select_rubric}', [
             'buttons' => $this->buttons()->back()
         ]);
+        $this->send('{rubrics}', [
+            'inlineButtons' => InlineButtons::createAdRubric(
+                $this->botService->getRubrics($page, 10),
+                $page
+            )
+        ]);
+    }
+
+    public function create_ad_subsection($data) {
+        if(is_array($data)) {
+            $rubricId = $data[0];
+            $page = $data[1];
+        }
+        else {
+            $rubricId = $data;
+            $page = 1;
+        }
+        $this->send('{select_subsection}', [
+            'inlineButtons' => InlineButtons::createAdSubsection(
+                $this->botService->getSubsectionsByRubric($rubricId, $page, 10),
+                $rubricId,
+                $page
+            )
+        ]);
+    }
+
+    public function create_ad_subsection_selected($subsectionId) {
+        $this->setInteraction('create_ad_title', [
+            'subsection_id' => $subsectionId
+        ]);
+
+        $this->send('{send_title_ad}', [
+            'buttons' => $this->buttons()->back(),
+            'input' => 'regular'
+        ]);
+    }
+
+    public function create_ad_title($params) {
+        $title = $this->getMessage();
+
+        $params['title'] = $title;
+
+        $this->setInteraction('create_ad_description', $params);
+
+        $this->send('{send_description_ad}', [
+            'buttons' => $this->buttons()->back(),
+            'input' => 'regular'
+        ]);
+    }
+
+    public function create_ad_description($params) {
+        $description = $this->getMessage();
+
+        $params['description'] = $description;
+
+        $this->setInteraction('create_ad_photo', $params);
+
+        $this->send('{send_photo}', [
+            'buttons' => $this->buttons()->back(),
+            'input' => 'regular'
+        ]);
+    }
+
+    public function create_ad_photo($params) {
+        if(MESSENGER == "Telegram") {
+            if($this->getType() == 'photo') {
+                $path = $this->getFilePath();
+                $fn = $this->botService->savePhoto($path);
+                if($fn) {
+                    $params['photo'] = $fn;
+                    $this->setInteraction('create_ad_phone', $params);
+
+                    $this->send('{send_phone}', [
+                        'buttons' => $this->buttons()->getPhone()
+                    ]);
+                }
+                else {
+                    $this->send('{error}', [
+                        'buttons' => $this->buttons()->back()
+                    ]);
+                }
+            }
+            else {
+                $this->send('{send_photo}', [
+                    'buttons' => $this->buttons()->back()
+                ]);
+            }
+        }
+    }
+
+    public function create_ad_phone($params) {
+        if(MESSENGER == "Telegram") {
+            if($this->getType() == "contact") {
+                $phone = $this->getDataByType()['phone'];
+                $params['phone'] = $phone;
+                $this->setInteraction('create_ad_location', $params);
+
+                $this->send('{send_location}', [
+                    'buttons' => $this->buttons()->getLocation()
+                ]);
+            }
+            else {
+                $this->send('{send_phone}', [
+                    'buttons' => $this->buttons()->getPhone()
+                ]);
+            }
+        }
+    }
+
+    public function create_ad_location($params) {
+        if(MESSENGER == "Telegram") {
+            if($this->getType() == "location") {
+                $location = $this->getDataByType();
+                $lat = $location['lat'];
+                $lon = $location['lon'];
+                $params['lat'] = $lat;
+                $params['lon'] = $lon;
+
+                if($this->addAd($params)) {
+                    $this->send('{create_ad_success}', [
+                        'buttons' => $this->buttons()->main_menu($this->getUserId())
+                    ]);
+                }
+                else {
+                    $this->send('{error}', [
+                        'buttons' => $this->buttons()->main_menu($this->getUserId())
+                    ]);
+                }
+
+                $this->delInteraction();
+            }
+            else {
+                $this->send('{send_location}', [
+                    'buttons' => $this->buttons()->getLocation()
+                ]);
+            }
+        }
+    }
+
+    private function addAd($params) {
+        $params['cities_id'] = $this->getCityId();
+        $params['user_id'] = $this->getUserId();
+        try {
+            $id = $this->botService->createAd($params);
+            return $id;
+        }
+        catch (Exception $e) {
+            return null;
+        }
     }
 
     public function my_ads() {
         $ads = $this->botService->getMyAds($this->getUserId());
-        if($ads == null) {
-            return $this->send('{you_have_no_ads}', [
+        if(empty($ads->toArray())) {
+            $this->send('{you_have_no_ads}', [
                 'buttons' => $this->buttons()->main_menu($this->getUserId())
             ]);
         }
@@ -177,4 +363,5 @@ class RequestHandler extends BaseRequestHandler {
             'buttons' => $this->buttons()->back()
         ]);
     }
+
 }

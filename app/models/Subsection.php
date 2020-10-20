@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subsection extends Model {
     protected $table = "subsections";
+    protected $with = ['rubric'];
     public $timestamps = false;
     public $fillable = [
         'name',

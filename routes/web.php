@@ -84,7 +84,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
 
     Route::group(['prefix' => 'cities', 'middleware' => 'access:cities'], function () {
         Route::get('/list', "Admin\CitiesController@list")->name('cities-list');
-        Route::get('/add', "Admin\CitiesController@add")->name('cities-add');
+        Route::get('/add/{id?}', "Admin\CitiesController@add")->name('cities-add');
         Route::post('/save', "Admin\CitiesController@save")->name('cities-save');
         Route::post('/go', "Admin\CitiesController@go")->name('cities-go');
         Route::get('/country/{id}', "Admin\CitiesController@listCities")->name('cities-country');
@@ -107,7 +107,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
             Route::get('/rubric/{id}', "Admin\SubsectionsController@listSubsections")
                 ->name('subsections-rubric');
             Route::get('/list', "Admin\SubsectionsController@list")->name('subsections-list');
-            Route::get('/add', "Admin\SubsectionsController@add")->name('subsections-add');
+            Route::get('/add/{id?}', "Admin\SubsectionsController@add")->name('subsections-add');
             Route::post('/add/save', "Admin\SubsectionsController@addSave")->name('subsections-add-save');
             Route::post('/edit', "Admin\SubsectionsController@edit")->name('subsection-edit');
             Route::post('/edit/save', "Admin\SubsectionsController@editSave")

@@ -27,11 +27,12 @@ class BotServiceImpl implements BotService {
         return Ad::where('title', 'LIKE', '%'.$str.'%')->get();
     }
 
-    function getRubrics() {
-        return Rubric::all();
+    function getRubrics(int $page, int $count) {
+        $offset = $count * ($page - 1);
+        return Rubric::offset($offset)->limit($count)->get();
     }
 
-    function getSubsectionsByRubric(int $rubricId) {
+    function getSubsectionsByRubric(int $rubricId, int $page, int $count) {
         return Subsection::where('rubrics_id', $rubricId)->get();
     }
 
@@ -40,7 +41,7 @@ class BotServiceImpl implements BotService {
     }
 
     function getMyAds(int $userId) {
-        Ad::where('users_id', $userId)->get();
+        return Ad::where('users_id', $userId)->get();
     }
 
     function getAdById(int $adId) {
@@ -53,10 +54,12 @@ class BotServiceImpl implements BotService {
         $ad->title = $a['title'];
         $ad->description = $a['description'];
         $ad->photo = $a['photo'];
-        $ad->phone = $a['photo'];
+        $ad->phone = $a['phone'];
         $ad->cities_id = $a['cities_id'];
         $ad->users_id = $a['user_id'];
         $ad->subsection_id = $a['subsection_id'];
+        $ad->lat = $a['lat'];
+        $ad->lon = $a['lon'];
         $ad->active = 0;
         $ad->date = date('Y-m-d');
         $ad->time = date('H:i:s');
@@ -83,5 +86,18 @@ class BotServiceImpl implements BotService {
 
     function deleteAd(int $adId): void {
         Ad::where('id', $adId)->delete();
+    }
+
+    function savePhoto($path): ? string {
+        $arrPath = explode('.', $path);
+        $ext = end($arrPath);
+        $fileName = md5(md5(time().rand(0, 100000).time())).".".$ext;
+
+        if(copy($path, public_path()."/photo_ad/".$fileName)) {
+            return $fileName;
+        }
+        else {
+            return null;
+        }
     }
 }

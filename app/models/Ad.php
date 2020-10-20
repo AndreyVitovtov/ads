@@ -15,6 +15,8 @@ class Ad extends Model {
         'cities_id',
         'users_id',
         'subsection_id',
+        'lat',
+        'lon',
         'active',
         'date',
         'time',

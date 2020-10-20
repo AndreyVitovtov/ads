@@ -26,13 +26,15 @@
                     <td>ID</td>
                     <td>@lang('pages.ads_title')</td>
                     <td>@lang('pages.ads_rubric')</td>
+                    <td>@lang('pages.ads_subsection')</td>
                     <td>@lang('pages.ads_action')</td>
                 </tr>
                 @foreach($ads as $ad)
                     <tr>
                         <td>{{ $ad->id }}</td>
                         <td>{{ $ad->title }}</td>
-                        <td>{{ $ad->rubric->name }}</td>
+                        <td>{{ $ad->subsection->rubric->name }}</td>
+                        <td>{{ $ad->subsection->name }}</td>
                     </tr>
                 @endforeach
             </table>

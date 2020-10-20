@@ -11,6 +11,8 @@ use App\models\Language;
 use App\models\Page;
 use App\models\Quran;
 use App\models\Recipe;
+use App\models\Rubric;
+use App\models\Subsection;
 use Illuminate\Database\Eloquent\Collection;
 
 class InlineButtons {
@@ -167,6 +169,158 @@ class InlineButtons {
             $buttons[] = [[
                 'text' => $city->name,
                 'callback_data' => 'selected_city__'.$city->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
+    public static function searchAdsByRubric($rubrics, int $page) {
+        $count = Rubric::count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'by_rubric__'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'by_rubric__'.$pp
+        ];
+
+        $buttons = [];
+        foreach($rubrics as $rubric) {
+            $buttons[] = [[
+                'text' => $rubric->name,
+                'callback_data' => 'by_rubric_subsection__'.$rubric->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
+    public static function searchAdsByRubricSubsection($subsections, int $rubricId, int $page) {
+        $count = Subsection::where('rubrics_id', $rubricId)->count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'by_rubric_subsection__'.$rubricId.'_'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'by_rubric_subsection__'.$rubricId.'_'.$pp
+        ];
+
+        $buttons = [];
+        foreach($subsections as $subsection) {
+            $buttons[] = [[
+                'text' => $subsection->name,
+                'callback_data' => 'by_rubric_subsection_selected__'.$subsection->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
+    public static function createAdRubric($rubrics, int $page) {
+        $count = Rubric::count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'create_ad__'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'create_ad__'.$pp
+        ];
+
+        $buttons = [];
+        foreach($rubrics as $rubric) {
+            $buttons[] = [[
+                'text' => $rubric->name,
+                'callback_data' => 'create_ad_subsection__'.$rubric->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
+    public static function createAdSubsection($subsections, $rubricId, int $page) {
+        $count = Subsection::where('rubrics_id', $rubricId)->count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'create_ad_subsection__'.$rubricId.'_'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'create_ad_subsection__'.$rubricId.'_'.$pp
+        ];
+
+        $buttons = [];
+        foreach($subsections as $subsection) {
+            $buttons[] = [[
+                'text' => $subsection->name,
+                'callback_data' => 'create_ad_subsection_selected__'.$subsection->id
             ]];
         }
 

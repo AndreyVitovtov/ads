@@ -44,10 +44,11 @@ class SubsectionsController extends Controller {
         ]));
     }
 
-    public function add() {
+    public function add($id = null) {
         return view('admin.subsections.add', [
             'rubrics' => $this->rubricService->all(),
-            'menuItem' => 'subsectionsadd'
+            'menuItem' => 'subsectionsadd',
+            'id' => $id
         ]);
     }
 
@@ -55,7 +56,9 @@ class SubsectionsController extends Controller {
         $this->subsectionService->create($request->post('name'), $request->post('rubric_id'));
 
         if($request->post('add_more')) {
-            return redirect()->to(route('subsections-add'));
+            return redirect()->to(route('subsections-add', [
+                'id' => $request->post('rubric_id')
+            ]));
         }
         else {
             return redirect()->to(route('subsections-rubric', [

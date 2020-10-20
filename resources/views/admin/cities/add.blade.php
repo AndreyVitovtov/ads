@@ -18,7 +18,11 @@
                 <label for="select_country">@lang('pages.countries_select_country')</label>
                 <select name="country_id" id="select_country">
                     @foreach($countries as $country)
-                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                        <option value="{{ $country->id }}"
+                            @if($country->id == $id)
+                               selected
+                            @endif
+                        >{{ $country->name }}</option>
                     @endforeach
                 </select>
                 <br>
