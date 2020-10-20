@@ -14,6 +14,7 @@ use App\models\Visit;
 
 trait Universal {
     public function __construct() {
+
         $this->messenger = $this->getMessenger();
 
         if($this->messenger == "Viber") {
@@ -180,6 +181,7 @@ trait Universal {
             $rules = [
                 'callback_query' => 'callback_query',
                 'channel_post' => 'channel_post',
+                'location' => 'location',
                 'text' => 'text',
                 'document' => 'document',
                 'photo' => 'photo',
@@ -234,7 +236,14 @@ trait Universal {
                         'size' => $request->message->size
                     ]
                 ];
-            } else {
+            } elseif($this->type == "location") {
+                $data = [
+                    'lat' => $request->message->location->lat,
+                    'lon' => $request->message->location->lon,
+                    'address' => $request->message->location->address
+                ];
+            }
+            else {
                 $data = [
                     'message_id' => $request->message_token,
                     'data' => null
@@ -350,12 +359,20 @@ trait Universal {
                     'text' => $request->channel_post->text
                 ];
             }
+            elseif($this->type == "location") {
+                $data = [
+                    'message_id' => $request->message->message_id,
+                    'lat' => $request->message->location->latitude,
+                    'lon' => $request->message->location->longitude
+                ];
+            }
             else {
                 $data = [
                     'message_id' => $request->message->message_id,
                     'data' => null
                 ];
             }
+
             return $data;
         }
     }
@@ -395,6 +412,9 @@ trait Universal {
             }
             elseif ($this->type == "file") {
                 return "file";
+            }
+            elseif ($this->type == "location") {
+                return "location";
             }
             else {
                 return null;
@@ -445,13 +465,29 @@ trait Universal {
             elseif($this->type == "photo") {
                 return "photo_sent";
             }
-            elseif ($this->type == "document") {
+            elseif($this->type == "document") {
                 return "document_sent";
+            }
+            elseif($this->type == "location") {
+                return "location";
             }
             else {
                 return null;
             }
         }
+    }
+
+    public function getLocation(): ? array {
+        if($this->type == "location") {
+            return $this->getDataByType();
+        }
+        else {
+            return null;
+        }
+    }
+
+    public function getParams($assoc = false) {
+        return json_decode($this->getInteraction()['params'], $assoc === true ? true : false);
     }
 
     public function getFilePath() {

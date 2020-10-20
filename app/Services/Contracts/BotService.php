@@ -5,8 +5,8 @@ namespace App\Services\Contracts;
 
 
 interface BotService {
-    function getCountries(int $page);
-    function getCitiesByCountry(int $countryId, int $page);
+    function getCountries(int $page, int $count);
+    function getCitiesByCountry(int $countryId, int $page, int $count);
     function getAdsByTitle(string $str);
     function getRubrics();
     function getSubsectionsByRubric(int $rubricId);

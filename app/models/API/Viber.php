@@ -2,7 +2,9 @@
 
 namespace app\models\API;
 
-	class Viber {
+	use Illuminate\Support\Facades\Log;
+
+    class Viber {
         private $token;
         private $request = null;
 
@@ -249,14 +251,17 @@ namespace app\models\API;
                 'receiver' => $chat,
                 'type' => 'rich_media',
                 'min_api_version' => 7,
-                'keyboard' => [
+                'rich_media' => $rich_media
+            ];
+
+            if(!empty($buttons)) {
+                $data['keyboard'] = [
                     "Type" => "keyboard",
                     'InputFieldState' => 'hidden',
                     "DefaultHeight" => 'false',
                     "Buttons" => $buttons
-                ],
-                'rich_media' => $rich_media
-            ];
+                ];
+            }
             return $this->makeRequest("https://chatapi.viber.com/pa/send_message", $data);
         }
 

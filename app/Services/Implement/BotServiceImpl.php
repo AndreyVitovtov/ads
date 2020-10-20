@@ -13,14 +13,12 @@ use App\Services\Contracts\BotService;
 
 class BotServiceImpl implements BotService {
 
-    function getCountries(int $page) {
-        $count = 10;
+    function getCountries(int $page, int $count) {
         $offset = $count * ($page - 1);
         return Country::offset($offset)->limit($count)->get();
     }
 
-    function getCitiesByCountry(int $countryId, int $page) {
-        $count = 10;
+    function getCitiesByCountry(int $countryId, int $page, int $count) {
         $offset = $count * ($page - 1);
         return City::where('country_id', $countryId)->offset($offset)->limit($count)->get();
     }

@@ -13,6 +13,7 @@ use App\models\ContactsModel;
 use App\models\ContactsType;
 use App\models\Language;
 use App\Services\Contracts\BotService;
+use Illuminate\Support\Facades\Log;
 
 trait RequestHandlerTrait {
     private $messenger;

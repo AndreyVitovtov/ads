@@ -4,6 +4,8 @@ namespace App\models\buttons;
 
 use App\models\Book;
 use App\models\BotUsers;
+use App\models\City;
+use App\models\Country;
 use App\models\Heading;
 use App\models\Khatma;
 use App\models\Page;
@@ -65,6 +67,21 @@ class ButtonsViber {
         ];
     }
 
+    private function button_location($columns, $rows, $text, $silent = false) {
+        return [
+            'Columns' => $columns,
+            'Rows' => $rows,
+            'ActionType' => 'location-picker',
+            'ActionBody' => 'jhg',
+            'BgColor' => $this->btnBg,
+            'Silent' => $silent,
+            'Text' => '<font color="'.$this->fontColor.'" size="'.$this->btnSize.'">'.$text.'</font>',
+            'TextSize' => 'large',
+            'TextVAlign' => 'middle',
+            'TextHAlign' => 'center',
+        ];
+    }
+
     public function start() {
         return [
             $this->button(6, 1, 'start', '{start}')
@@ -76,8 +93,11 @@ class ButtonsViber {
 
 //        if($user->access == '1') {
            return [
-               $this->button(6, 1, 'contacts', '{contacts}'),
-               $this->button(6, 1, 'languages', '{languages}'),
+               $this->button(3, 1, 'search_ads', '{search_ads}'),
+               $this->button(3, 1, 'create_ad', '{create_ad}'),
+               $this->button(3, 1, 'my_ads', '{my_ads}'),
+               $this->button(3, 1, 'contacts', '{contacts}'),
+               $this->button(6, 1, 'edit_country', '{edit_country}')
            ];
     }
 
@@ -104,5 +124,127 @@ class ButtonsViber {
         }
 
         return $buttons;
+    }
+
+
+    public function countries($countries, $page) {
+        $count = Country::count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $buttons = [];
+        foreach($countries as $country) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'select_city__'.$country->id,
+                $country->name
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'select_country__'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'select_country__'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'select_country__'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'select_country__'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function cities($cities, $countryId, $page) {
+        $count = City::where('country_id', $countryId)->count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'select_city__'.$countryId.'_'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'select_city__'.$countryId.'_'.$pp
+        ];
+
+        $buttons = [];
+        foreach($cities as $city) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'selected_city__'.$city->id,
+                $city->name
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'select_city__'.$countryId.'_'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'select_city__'.$countryId.'_'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'select_city__'.$countryId.'_'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'select_city__'.$countryId.'_'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function search_ads() {
+        return [
+            $this->button(3, 1, 'by_title', '{by_title}'),
+            $this->button(3, 1, 'by_rubric', '{by_rubric}'),
+            $this->button_location(3, 1, '{closest_to_me}'),
+            $this->button(3, 1, 'back', '{back}')
+        ];
     }
 }

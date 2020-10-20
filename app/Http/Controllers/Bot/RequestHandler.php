@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Bot;
 
 use App\Http\Controllers\Bot\Traits\RequestHandlerTrait;
+use App\models\BotUsers;
 use App\models\buttons\InlineButtons;
+use App\models\City;
+use App\models\Country;
 
 class RequestHandler extends BaseRequestHandler {
 
@@ -12,7 +15,10 @@ class RequestHandler extends BaseRequestHandler {
     public function select_country($page = 1) {
         if(MESSENGER == 'Telegram') {
             $res = $this->send("{select_country}", [
-                'inlineButtons' => InlineButtons::countries($this->botService->getCountries($page), $page),
+                'inlineButtons' => InlineButtons::countries(
+                    $this->botService->getCountries($page, 10),
+                    $page
+                ),
                 'hideKeyboard' => true
             ]);
 
@@ -22,8 +28,17 @@ class RequestHandler extends BaseRequestHandler {
         }
         elseif(MESSENGER == 'Viber') {
             $this->send('{select_country}');
-            $this->sendCarusel([
-                ''
+            $countries = $this->botService->getCountries($page, 30);
+            $rows = count($countries) < 7 ? count($countries) : 7;
+            if(Country::count() > count($countries) && $rows != 7) {
+                $rows++;
+            }
+             $this->sendCarusel([
+                'richMedia' => $this->buttons()->countries(
+                    $countries,
+                    $page
+                ),
+                'rows' => $rows
             ]);
         }
     }
@@ -44,7 +59,7 @@ class RequestHandler extends BaseRequestHandler {
 
             $res = $this->send("{select_city}", [
                 'inlineButtons' => InlineButtons::cities(
-                    $this->botService->getCitiesByCountry($countryId, $page),
+                    $this->botService->getCitiesByCountry($countryId, $page, 10),
                     $countryId, $page
                 ),
                 'hideKeyboard' => true
@@ -55,38 +70,62 @@ class RequestHandler extends BaseRequestHandler {
             ]);
         }
         elseif(MESSENGER == 'Viber') {
-            $this->send('{select_country}');
+            $this->send('{select_city}');
+            $cities = $this->botService->getCitiesByCountry($countryId, $page, 30);
+            $rows = count($cities) < 7 ? count($cities) : 7;
+            if(City::count() > count($cities) && $rows != 7) {
+                $rows++;
+            }
             $this->sendCarusel([
-                ''
+                'richMedia' => $this->buttons()->cities(
+                    $cities,
+                    $countryId,
+                    $page
+                ),
+                'rows' => $rows
             ]);
         }
     }
 
     public function selected_city($cityId) {
-        $params = json_decode($this->getInteraction()['params']);
-        $this->deleteMessage($params->messageId);
+        if(MESSENGER == 'Telegram') {
+            $params = json_decode($this->getInteraction()['params']);
+            $this->deleteMessage($params->messageId);
+        }
 
-        $this->setInteraction('', [
-            'city_id' => $cityId
-        ]);
+        $this->setCityId($cityId);
 
         $this->send('{city_saved}', [
             'buttons' => $this->buttons()->main_menu($this->getUserId())
         ]);
     }
 
-    private function getCityId(): ? int {
-        $params = json_decode($this->getInteraction()['params']);
-        if(isset($params->city_id)) {
-            return $params->city_id;
-        }
-        return null;
+    private function setCityId($cityId) {
+        $user = BotUsers::find($this->getUserId());
+        $user->cities_id = $cityId;
+        $user->save();
+    }
+
+    private function getCityId() {
+        return BotUsers::find($this->getUserId())->cities_id;
     }
 
     public function search_ads() {
+        $this->setInteraction('search_ads_p');
+
         $this->send('{select_menu_item}', [
             'buttons' => $this->buttons()->search_ads()
         ]);
+    }
+
+    public function search_ads_p() {
+        $location = $this->getLocation();
+        if($location != null) {
+            $this->send($location['lat']);
+        }
+        else {
+            $this->search_ads();
+        }
     }
 
     public function by_title() {

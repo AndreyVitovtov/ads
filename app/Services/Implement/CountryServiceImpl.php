@@ -4,17 +4,34 @@
 namespace App\Services\Implement;
 
 
+use App\models\City;
 use App\models\Country;
 use App\Services\Contracts\CountryService;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class CountryServiceImpl implements CountryService {
 
     function create($name): int {
-        $country = new Country();
-        $country->name = $name;
-        $country->save();
+        try {
+            DB::beginTransaction();
+            $country = new Country();
+            $country->name = $name;
+            $country->save();
 
-        return $country->id;
+            $city = new City();
+            $city->name = "Любой город";
+            $city->country_id = $country->id;
+            $city->save();
+
+            DB::commit();
+
+            return $country->id;
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            return null;
+        }
     }
 
     function rename($id, $name): void {

@@ -213,6 +213,11 @@
                 'BgColor' => '#FFFFFF',
                 'Buttons' => $params['richMedia']
             ];
+
+            if(!isset($params['buttons'])) {
+                $params['buttons'] = [];
+            }
+
             return $this->bot->sendCarusel($this->chat, $richMedia, $params['buttons']);
         }
 
