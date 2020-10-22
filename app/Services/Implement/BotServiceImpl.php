@@ -10,6 +10,7 @@ use App\models\Country;
 use App\models\Rubric;
 use App\models\Subsection;
 use App\Services\Contracts\BotService;
+use Illuminate\Support\Facades\File;
 
 class BotServiceImpl implements BotService {
 
@@ -89,8 +90,9 @@ class BotServiceImpl implements BotService {
     }
 
     function savePhoto($path): ? string {
-        $arrPath = explode('.', $path);
-        $ext = end($arrPath);
+        $extension = File::extension($path);
+        $extension = explode('?', $extension);
+        $ext = $extension[0];
         $fileName = md5(md5(time().rand(0, 100000).time())).".".$ext;
 
         if(copy($path, public_path()."/photo_ad/".$fileName)) {

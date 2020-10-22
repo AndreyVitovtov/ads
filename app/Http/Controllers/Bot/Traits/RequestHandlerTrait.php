@@ -30,7 +30,7 @@ trait RequestHandlerTrait {
             $this->messenger = "Facebook";
         }
         else {
-            $this->messenger = "Telegram";
+            $this->messenger = "Viber";
         }
 
         define("MESSENGER", $this->messenger);

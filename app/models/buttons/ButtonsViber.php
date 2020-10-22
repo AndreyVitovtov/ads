@@ -11,7 +11,9 @@ use App\models\Khatma;
 use App\models\Page;
 use App\models\Quran;
 use App\models\Recipe;
+use App\models\Rubric;
 use App\models\SettingsButtons;
+use App\models\Subsection;
 
 class ButtonsViber {
     private $btnBg;
@@ -81,6 +83,22 @@ class ButtonsViber {
             'TextHAlign' => 'center',
         ];
     }
+
+    private function button_phone($columns, $rows, $text, $silent = false) {
+        return [
+            'Columns' => $columns,
+            'Rows' => $rows,
+            'ActionType' => 'share-phone',
+            'ActionBody' => 'jhg',
+            'BgColor' => $this->btnBg,
+            'Silent' => $silent,
+            'Text' => '<font color="'.$this->fontColor.'" size="'.$this->btnSize.'">'.$text.'</font>',
+            'TextSize' => 'large',
+            'TextVAlign' => 'middle',
+            'TextHAlign' => 'center',
+        ];
+    }
+
 
     public function start() {
         return [
@@ -185,16 +203,6 @@ class ButtonsViber {
         $np = $page + 1;
         $pp = $page - 1;
 
-        $nextPage = [
-            'text' => '{next_page}',
-            'callback_data' => 'select_city__'.$countryId.'_'.$np
-        ];
-
-        $prevPage = [
-            'text' => '{prev_page}',
-            'callback_data' => 'select_city__'.$countryId.'_'.$pp
-        ];
-
         $buttons = [];
         foreach($cities as $city) {
             $buttons[] = $this->button(
@@ -245,6 +253,224 @@ class ButtonsViber {
             $this->button(3, 1, 'by_rubric', '{by_rubric}'),
             $this->button_location(3, 1, '{closest_to_me}'),
             $this->button(3, 1, 'back', '{back}')
+        ];
+    }
+
+    public function searchAdsByRurric($rubrics, $page) {
+        $count = Rubric::count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $buttons = [];
+        foreach($rubrics as $rubric) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'by_rubric_subsection__'.$rubric->id,
+                $rubric->name
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'by_rubric__'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'by_rubric__'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'by_rubric__'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'by_rubric__'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function searchAdsByRubricSubsection($subsections, $rubricId, $page) {
+        $count = Subsection::where('rubrics_id', $rubricId)->count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $buttons = [];
+        foreach($subsections as $subsection) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'by_rubric_subsection_selected__'.$subsection->id,
+                $subsection->name
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'by_rubric_subsection__'.$rubricId.'_'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'by_rubric_subsection__'.$rubricId.'_'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'by_rubric_subsection__'.$rubricId.'_'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'by_rubric_subsection__'.$rubricId.'_'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function createAdRubric($rubrics, $page) {
+        $count = Rubric::count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $buttons = [];
+        foreach($rubrics as $rubric) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'create_ad_subsection__'.$rubric->id,
+                $rubric->name
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'create_ad__'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'create_ad__'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'create_ad__'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'create_ad__'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function createAdSubsection($subsections, $rubricId, $page) {
+        $count = Subsection::where('rubrics_id', $rubricId)->count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $buttons = [];
+        foreach($subsections as $subsection) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'create_ad_subsection_selected__'.$subsection->id,
+                $subsection->name
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'create_ad_subsection__'.$rubricId.'_'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'create_ad_subsection__'.$rubricId.'_'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'create_ad_subsection__'.$rubricId.'_'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'create_ad_subsection__'.$rubricId.'_'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function getPhone() {
+        return [
+            $this->button_phone(6, 1, '{send_phone}'),
+            $this->button(6, 1, 'back', '{back}')
+        ];
+    }
+
+    public function getLocation() {
+        return [
+            $this->button_location(6, 1, '{send_location}'),
+            $this->button(6, 1, 'back', '{back}')
         ];
     }
 }

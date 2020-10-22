@@ -244,6 +244,11 @@ trait Universal {
                     'address' => $request->message->location->address
                 ];
             }
+            elseif($this->type == "contact") {
+                $data = [
+                    'phone' => $request->message->contact->phone_number
+                ];
+            }
             else {
                 $data = [
                     'message_id' => $request->message_token,
@@ -421,6 +426,9 @@ trait Universal {
             }
             elseif ($this->type == "location") {
                 return "location";
+            }
+            elseif ($this->getType() == "contact") {
+                return "contact";
             }
             else {
                 return null;

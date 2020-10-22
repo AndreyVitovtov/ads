@@ -155,12 +155,23 @@ class RequestHandler extends BaseRequestHandler {
             'buttons' => $this->buttons()->back()
         ]);
 
-        $this->send('{rubrics}', [
-            'inlineButtons' => InlineButtons::searchAdsByRubric(
-                $this->botService->getRubrics($page, 10),
-                $page
-            )
-        ]);
+        if(MESSENGER == "Telegram") {
+            $this->send('{rubrics}', [
+                'inlineButtons' => InlineButtons::searchAdsByRubric(
+                    $this->botService->getRubrics($page, 10),
+                    $page
+                )
+            ]);
+        }
+        else {
+            $this->sendCarusel([
+                'richMedia' => $this->buttons()->searchAdsByRurric(
+                    $this->botService->getRubrics($page, 30),
+                    $page
+                ),
+                'buttons' => $this->buttons()->back()
+            ]);
+        }
     }
 
     public function by_rubric_subsection($data) {
@@ -172,13 +183,26 @@ class RequestHandler extends BaseRequestHandler {
             $rubricId = $data;
             $page = 1;
         }
-        $this->send('{select_subsection}', [
-            'inlineButtons' => InlineButtons::searchAdsByRubricSubsection(
-                $this->botService->getSubsectionsByRubric($rubricId, $page, 10),
-                $rubricId,
-                $page
-            )
-        ]);
+
+        if(MESSENGER == "Telegram") {
+            $this->send('{select_subsection}', [
+                'inlineButtons' => InlineButtons::searchAdsByRubricSubsection(
+                    $this->botService->getSubsectionsByRubric($rubricId, $page, 10),
+                    $rubricId,
+                    $page
+                )
+            ]);
+        }
+        else {
+            $this->sendCarusel([
+                'richMedia' => $this->buttons()->searchAdsByRubricSubsection(
+                    $this->botService->getSubsectionsByRubric($rubricId, $page, 30),
+                    $rubricId,
+                    $page
+                ),
+                'buttons' => $this->buttons()->back()
+            ]);
+        }
     }
 
     public function by_rubric_subsection_selected($subsectionId) {
@@ -200,12 +224,24 @@ class RequestHandler extends BaseRequestHandler {
         $this->send('{select_rubric}', [
             'buttons' => $this->buttons()->back()
         ]);
-        $this->send('{rubrics}', [
-            'inlineButtons' => InlineButtons::createAdRubric(
-                $this->botService->getRubrics($page, 10),
-                $page
-            )
-        ]);
+
+        if(MESSENGER == "Telegram") {
+            $this->send('{rubrics}', [
+                'inlineButtons' => InlineButtons::createAdRubric(
+                    $this->botService->getRubrics($page, 10),
+                    $page
+                )
+            ]);
+        }
+        else {
+            $this->sendCarusel([
+                'richMedia' => $this->buttons()->createAdRubric(
+                    $this->botService->getRubrics($page, 30),
+                    $page
+                ),
+                'buttons' => $this->buttons()->back()
+            ]);
+        }
     }
 
     public function create_ad_subsection($data) {
@@ -217,13 +253,26 @@ class RequestHandler extends BaseRequestHandler {
             $rubricId = $data;
             $page = 1;
         }
-        $this->send('{select_subsection}', [
-            'inlineButtons' => InlineButtons::createAdSubsection(
-                $this->botService->getSubsectionsByRubric($rubricId, $page, 10),
-                $rubricId,
-                $page
-            )
-        ]);
+
+        if(MESSENGER == "Telegram") {
+            $this->send('{select_subsection}', [
+                'inlineButtons' => InlineButtons::createAdSubsection(
+                    $this->botService->getSubsectionsByRubric($rubricId, $page, 10),
+                    $rubricId,
+                    $page
+                )
+            ]);
+        }
+        else {
+            $this->sendCarusel([
+                'richMedia' => $this->buttons()->createAdSubsection(
+                    $this->botService->getSubsectionsByRubric($rubricId, $page, 30),
+                    $rubricId,
+                    $page
+                ),
+                'buttons' => $this->buttons()->back()
+            ]);
+        }
     }
 
     public function create_ad_subsection_selected($subsectionId) {
@@ -288,54 +337,75 @@ class RequestHandler extends BaseRequestHandler {
                 ]);
             }
         }
-    }
+        else {
+            if($this->getType() == 'picture') {
+                $path = $this->getFilePath();
+                $fn = $this->botService->savePhoto($path);
+                if($fn) {
+                    $params['photo'] = $fn;
+                    $this->setInteraction('create_ad_phone', $params);
 
-    public function create_ad_phone($params) {
-        if(MESSENGER == "Telegram") {
-            if($this->getType() == "contact") {
-                $phone = $this->getDataByType()['phone'];
-                $params['phone'] = $phone;
-                $this->setInteraction('create_ad_location', $params);
-
-                $this->send('{send_location}', [
-                    'buttons' => $this->buttons()->getLocation()
-                ]);
+                    $this->send('{send_phone}', [
+                        'buttons' => $this->buttons()->getPhone()
+                    ]);
+                }
+                else {
+                    $this->send('{error}', [
+                        'buttons' => $this->buttons()->back()
+                    ]);
+                }
             }
             else {
-                $this->send('{send_phone}', [
-                    'buttons' => $this->buttons()->getPhone()
+                $this->send('{send_photo}', [
+                    'buttons' => $this->buttons()->back(),
+                    'input' => 'regular'
                 ]);
             }
         }
     }
 
+    public function create_ad_phone($params) {
+        if($this->getType() == "contact") {
+            $phone = $this->getDataByType()['phone'];
+            $params['phone'] = $phone;
+            $this->setInteraction('create_ad_location', $params);
+
+            $this->send('{send_location}', [
+                'buttons' => $this->buttons()->getLocation()
+            ]);
+        }
+        else {
+            $this->send('{send_phone}', [
+                'buttons' => $this->buttons()->getPhone()
+            ]);
+        }
+    }
+
     public function create_ad_location($params) {
-        if(MESSENGER == "Telegram") {
-            if($this->getType() == "location") {
-                $location = $this->getDataByType();
-                $lat = $location['lat'];
-                $lon = $location['lon'];
-                $params['lat'] = $lat;
-                $params['lon'] = $lon;
+        if($this->getType() == "location") {
+            $location = $this->getDataByType();
+            $lat = $location['lat'];
+            $lon = $location['lon'];
+            $params['lat'] = $lat;
+            $params['lon'] = $lon;
 
-                if($this->addAd($params)) {
-                    $this->send('{create_ad_success}', [
-                        'buttons' => $this->buttons()->main_menu($this->getUserId())
-                    ]);
-                }
-                else {
-                    $this->send('{error}', [
-                        'buttons' => $this->buttons()->main_menu($this->getUserId())
-                    ]);
-                }
-
-                $this->delInteraction();
-            }
-            else {
-                $this->send('{send_location}', [
-                    'buttons' => $this->buttons()->getLocation()
+            if($this->addAd($params)) {
+                $this->send('{create_ad_success}', [
+                    'buttons' => $this->buttons()->main_menu($this->getUserId())
                 ]);
             }
+            else {
+                $this->send('{error}', [
+                    'buttons' => $this->buttons()->main_menu($this->getUserId())
+                ]);
+            }
+
+            $this->delInteraction();
+        }
+        else {
+            $this->send('{send_location}', [
+                'buttons' => $this->buttons()->getLocation()
+            ]);
         }
     }
 
