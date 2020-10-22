@@ -63,7 +63,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
 
     Route::group(['prefix' => '/users', 'middleware' => 'access:users'], function () {
         Route::get('/', "Admin\Users@index")->name('users');
-        Route::get('/profile/{id}', "Admin\Users@profile");
+        Route::get('/profile/{id}', "Admin\Users@profile")->name('user-profile');
         Route::get('/search', "Admin\Users@createUrlSearch");
         Route::get('/search/{str}', "Admin\Users@search");
         Route::post('/access/', "Admin\Users@access")->name('user-access');
@@ -145,6 +145,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
             Route::post('/edit', "Admin\AdsController@edit")->name('ads-edit');
             Route::post('/edit/save', "Admin\AdsController@editSave")->name('ads-edit-save');
             Route::post('/delete', "Admin\AdsController@delete")->name('ads-delete');
+            Route::post('/activate', "Admin\AdsController@activate")->name('ads-activate');
         });
 
         Route::group(['prefix' => 'answers', 'middleware' => 'access:answers'], function () {

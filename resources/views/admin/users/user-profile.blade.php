@@ -103,57 +103,6 @@
                 </div>
             </form>
         </div>
-        <br>
-        <hr>
-        <br>
-        <div>
-            <form action="{{ route('user-count-chat') }}" method="POST">
-                <input type="hidden" name="user_id" value="{{ $profile->id }}">
-                @csrf
-                <div>
-                    <label for="count_chat">@lang('pages.users_count_chats')</label>
-                </div>
-                <div>
-                    <input type="number" name="count" id="count_chat">
-                </div>
-                <br>
-                <div>
-                    <input type="submit" value="@lang('pages.users_add')" class="button">
-                </div>
-            </form>
-        </div>
-        <br>
-        <hr>
-        <br>
-        <div>
-            <form action="{{ route('user-count-mailing') }}" method="POST">
-                @csrf
-                <input type="hidden" name="user_id" value="{{ $profile->id }}">
-                <div>
-                    <label for="select_chat">@lang('pages.users_select_chat')</label>
-                </div>
-                <div>
-                    <select name="chat" id="select_chat">
-                        @foreach($profile->chats as $chat)
-                            <option value="{{ $chat->id }}">{{ $chat->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="count_mailing">@lang('pages.users_count_mailing')</label>
-                </div>
-                <div>
-                    <input type="number" name="count" id="count_mailing">
-                </div>
-                <br>
-                <div>
-                    <input type="submit" value="@lang('pages.users_add')" class="button">
-                </div>
-            </form>
-        </div>
-
-
-
     </div>
 
     <script>

@@ -6,7 +6,7 @@ namespace App\Services\Contracts;
 
 interface AdService {
     function create(array $ad): int;
-    function edit(int $id, array $ad): void;
+    function edit(int $id, array $ad, $photo = null): void;
     function delete(int $id): void;
     function activate(int $id): void;
     function editTitle(int $id, $title): void;
@@ -17,4 +17,5 @@ interface AdService {
     function getActive();
     function getOnModerationPaginate(int $count);
     function getActivePaginate(int $count);
+    function deletePhoto(int $id);
 }
