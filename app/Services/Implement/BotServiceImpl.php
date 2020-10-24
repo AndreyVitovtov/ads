@@ -26,7 +26,9 @@ class BotServiceImpl implements BotService {
 
     function getAdsByTitle(string $str, int $cityId) {
         return Ad::where('cities_id', $cityId)
-            ->where('title', 'LIKE', '%'.$str.'%')->get();
+            ->where('title', 'LIKE', '%'.$str.'%')
+            ->where('active', 1)
+            ->get();
     }
 
     function getRubrics(int $page, int $count) {
@@ -42,8 +44,10 @@ class BotServiceImpl implements BotService {
             ->get();
     }
 
-    function getAdsBySubsection(int $subsectionId) {
-        return Ad::where('subsection_id', $subsectionId)->get();
+    function getAdsBySubsection(int $subsectionId, int $cityId) {
+        return Ad::where('subsection_id', $subsectionId)
+            ->where('cities_id', $cityId)
+            ->get();
     }
 
     function getMyAds(int $userId, int $page, int $count) {

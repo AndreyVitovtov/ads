@@ -256,7 +256,7 @@ class ButtonsViber {
         return [
             $this->button(3, 1, 'by_title', '{by_title}'),
             $this->button(3, 1, 'by_rubric', '{by_rubric}'),
-            $this->button_location(3, 1, '{closest_to_me}'),
+            $this->button(3, 1, 'closest_to_me', '{closest_to_me}'),
             $this->button(3, 1, 'back', '{back}')
         ];
     }
@@ -565,9 +565,9 @@ class ButtonsViber {
                 6,
                 7,
                 'reply',
-                'open_ad__'.$ad->id,
-                url('photo_ad/'.$ad->photo),
-                $ad->title,
+                'open_ad__'.$ad['id'],
+                url('photo_ad/'.$ad['photo']),
+                $ad['title'],
                 [
                     'text-color' => '#ffffff',
                     'text-size' => '20',
@@ -575,14 +575,15 @@ class ButtonsViber {
                     'TextHAlign' => 'left'
                 ]
             );
-//            $buttons[] = $this->button(
-//                6,
-//                1,
-//                'open_ad__'.$ad->id,
-//                $ad->title
-//            );
         }
 
         return $buttons;
+    }
+
+    public function moreBack() {
+        return [
+            $this->button(6, 1, 'more', '{more}'),
+            $this->button(6, 1, 'back', '{back}')
+        ];
     }
 }

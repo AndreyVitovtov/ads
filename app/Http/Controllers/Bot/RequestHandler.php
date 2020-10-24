@@ -108,8 +108,6 @@ class RequestHandler extends BaseRequestHandler {
     }
 
     public function search_ads() {
-        $this->setInteraction('search_ads_p');
-
         $this->send('{select_menu_item}', [
             'buttons' => $this->buttons()->search_ads()
         ]);
@@ -139,24 +137,29 @@ class RequestHandler extends BaseRequestHandler {
     public function search_ads_title() {
         $str = $this->getMessage();
         $ads = $this->botService->getAdsByTitle($str, $this->getUser()->cities_id);
+        $ads = array_chunk($ads->toArray(), 10);
 
-        if(empty($ads->toArray())) {
+        if(empty($ads[0])) {
             $this->send('{no_ads_found}', [
                 'buttons' => $this->buttons()->search_ads()
             ]);
         }
         else {
             if(MESSENGER == 'Telegram') {
-
+                $this->send('');
             }
             else {
                 $this->sendCarusel([
-                    'richMedia' => $this->buttons()->ads($ads),
-                    'buttons' => $this->buttons()->search_ads()
+                    'richMedia' => $this->buttons()->ads($ads[0]),
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
                 ]);
             }
+            $this->setInteraction('', [
+                'page' => 1,
+                'type' => 'search_ads_title',
+                'str' => $str
+            ]);
         }
-        $this->delInteraction();
     }
 
     public function open_ad($id) {
@@ -240,9 +243,92 @@ class RequestHandler extends BaseRequestHandler {
     }
 
     public function by_rubric_subsection_selected($subsectionId) {
-        $this->send($subsectionId, [
-            'buttons' => $this->buttons()->back()
+        $ads = $this->botService->getAdsBySubsection($subsectionId, $this->getUser()->cities_id);
+        $ads = array_chunk($ads->toArray(), 10);
+
+        if(empty($ads[0])) {
+            $this->send('{no_ads_found}', [
+                'buttons' => $this->buttons()->search_ads()
+            ]);
+        }
+        else {
+            if(MESSENGER == 'Telegram') {
+                $this->send('');
+            }
+            else {
+                $this->sendCarusel([
+                    'richMedia' => $this->buttons()->ads($ads[0]),
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+            }
+            $this->setInteraction('', [
+                'page' => 1,
+                'type' => 'search_ads_rubric',
+                'subsection_id' => $subsectionId
+            ]);
+        }
+    }
+
+    public function closest_to_me() {
+        $this->send('{send_location}', [
+            'buttons' => $this->buttons()->getLocation()
         ]);
+
+        $this->setInteraction('search_ads_locality');
+    }
+
+    public function search_ads_locality() {
+        if($this->getType() == 'location') {
+            $loc = $this->getDataByType();
+            $this->send($loc['lat'].", ".$loc['lon'], [
+                'buttons' => $this->buttons()->back()
+            ]);
+        }
+    }
+
+    public function more() {
+        $params = $this->getParams();
+
+        if($params->type == 'search_ads_title') {
+            if(MESSENGER == "Telegram") {
+
+            }
+            else {
+                $ads = $this->botService->getAdsByTitle($params->str, $this->getUser()->cities_id);
+                $ads = array_chunk($ads->toArray(), 10);
+
+                $this->sendCarusel([
+                    'richMedia' => $this->buttons()->ads($ads[$params->page]),
+                    'buttons' => isset($ads[$params->page+1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                $this->setInteraction('', [
+                    'page' => $params->page+1,
+                    'type' => 'search_ads_title',
+                    'str' => $params->str
+                ]);
+            }
+        }
+        elseif($params->type == 'search_ads_rubric') {
+            if(MESSENGER == "Telegram") {
+
+            }
+            else {
+                $ads = $this->botService->getAdsBySubsection($params->subsection_id, $this->getUser()->cities_id);
+                $ads = array_chunk($ads->toArray(), 10);
+
+                $this->sendCarusel([
+                    'richMedia' => $this->buttons()->ads($ads[$params->page]),
+                    'buttons' => isset($ads[$params->page+1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                $this->setInteraction('', [
+                    'page' => $params->page+1,
+                    'type' => 'search_ads_rubric',
+                    'subsection_id' => $params->subsection_id
+                ]);
+            }
+        }
     }
 
     public function edit_country() {

@@ -10,7 +10,7 @@ interface BotService {
     function getAdsByTitle(string $str, int $cityId);
     function getRubrics(int $page, int $count);
     function getSubsectionsByRubric(int $rubricId, int $page, int $count);
-    function getAdsBySubsection(int $subsectionId);
+    function getAdsBySubsection(int $subsectionId, int $cityId);
     function getMyAds(int $userId, int $page, int $count);
     function getAdById(int $adId);
     function createAd(array $ad): int;
