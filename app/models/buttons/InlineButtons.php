@@ -2,6 +2,7 @@
 
 namespace App\models\buttons;
 
+use App\models\Ad;
 use App\models\BotUsers;
 use App\models\City;
 use App\models\Country;
@@ -321,6 +322,44 @@ class InlineButtons {
             $buttons[] = [[
                 'text' => $subsection->name,
                 'callback_data' => 'create_ad_subsection_selected__'.$subsection->id
+            ]];
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = [$nextPage];
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = [$prevPage];
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = [$prevPage, $nextPage];
+        }
+
+        return $buttons;
+    }
+
+    public static function myAds($ads, int $userId, int $page) {
+        $count = Ad::where('users_id', $userId)->count();
+        $countPage = $count / 10;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $nextPage = [
+            'text' => '{next_page}',
+            'callback_data' => 'my_ads__'.$np
+        ];
+
+        $prevPage = [
+            'text' => '{prev_page}',
+            'callback_data' => 'my_ads__'.$pp
+        ];
+
+        $buttons = [];
+        foreach($ads as $ad) {
+            $buttons[] = [[
+                'text' => $ad->title,
+                'callback_data' => 'settings_my_ad__'.$ad->id
             ]];
         }
 

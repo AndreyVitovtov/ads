@@ -2,6 +2,7 @@
 
 namespace App\models\buttons;
 
+use App\models\Ad;
 use App\models\Book;
 use App\models\BotUsers;
 use App\models\City;
@@ -56,7 +57,10 @@ class ButtonsViber {
         ];
     }
 
-    private function button_img($columns, $rows, $actionType, $actionBody, $image, $text = "") {
+    private function button_img($columns, $rows, $actionType, $actionBody, $image, $text = "", $params = []) {
+        if(isset($params['text-color']) && isset($params['text-size'])) {
+            $text = '<font color="'.$params['text-color'].'" size="'.$params['text-size'].'">'.$text.'</font>';
+        }
         return [
             'Columns' => $columns,
             'Rows' => $rows,
@@ -64,8 +68,9 @@ class ButtonsViber {
             'ActionBody' => $actionBody,
             'Image' => $image,
             'Text' => $text,
-            'TextVAlign' => 'middle',
-			'TextHAlign' => 'center'
+            'TextVAlign' => isset($params['TextVAlign']) ? $params['TextVAlign'] : 'middle',
+			'TextHAlign' => isset($params['TextHAlign']) ? $params['TextHAlign'] : 'center',
+            'TextSize' => 'large'
         ];
     }
 
@@ -472,5 +477,112 @@ class ButtonsViber {
             $this->button_location(6, 1, '{send_location}'),
             $this->button(6, 1, 'back', '{back}')
         ];
+    }
+
+    public function myAds($ads, $userId, $page) {
+        $count = Ad::where('users_id', $userId)->count();
+        $countPage = $count / 30;
+
+        $np = $page + 1;
+        $pp = $page - 1;
+
+        $buttons = [];
+        foreach($ads as $ad) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'settings_my_ad__'.$ad->id,
+                $ad->title
+            );
+        }
+
+        if($page == 1 && $countPage > 1) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'my_ads__'.$np,
+                '{next_page}'
+            );
+        }
+        elseif($page > 1 && $countPage == $page) {
+            $buttons[] = $this->button(
+                6,
+                1,
+                'my_ads__'.$pp,
+                '{prev_page}'
+            );
+        }
+        elseif($page > 1 && $countPage > $page) {
+            $buttons[] = $this->button(
+                3,
+                1,
+                'my_ads__'.$pp,
+                '{prev_page}'
+            );
+            $buttons[] = $this->button(
+                3,
+                1,
+                'my_ads__'.$np,
+                '{next_page}'
+            );
+        }
+
+        return $buttons;
+    }
+
+    public function settingsAd() {
+        return [
+            $this->button(3, 1, 'edit_title', '{edit_title}'),
+            $this->button(3, 1, 'edit_description', '{edit_description}'),
+            $this->button(3, 1, 'edit_photo', '{edit_photo}'),
+            $this->button(3, 1, 'edit_location', '{edit_location}'),
+            $this->button(3, 1, 'read_ad', '{read_ad}'),
+            $this->button(3, 1, 'delete_ad', '{delete_ad}'),
+            $this->button(6, 1, 'back', '{back}'),
+        ];
+    }
+
+    public function backToSettingsAd() {
+        return [
+            $this->button(6, 1, 'back_to_settings_ad', '{back_to_settings_ad}'),
+            $this->button(6, 1, 'back', '{back}')
+        ];
+    }
+
+    public function sendLocationBackToSettingsAd() {
+        return [
+            $this->button_location(6, 1, '{send_location}'),
+            $this->button(6, 1, 'back_to_settings_ad', '{back_to_settings_ad}'),
+            $this->button(6, 1, 'back', '{back}')
+        ];
+    }
+
+    public function ads($ads) {
+        $buttons = [];
+
+        foreach($ads as $ad) {
+            $buttons[] = $this->button_img(
+                6,
+                7,
+                'reply',
+                'open_ad__'.$ad->id,
+                url('photo_ad/'.$ad->photo),
+                $ad->title,
+                [
+                    'text-color' => '#ffffff',
+                    'text-size' => '20',
+                    'TextVAlign' => 'bottom',
+                    'TextHAlign' => 'left'
+                ]
+            );
+//            $buttons[] = $this->button(
+//                6,
+//                1,
+//                'open_ad__'.$ad->id,
+//                $ad->title
+//            );
+        }
+
+        return $buttons;
     }
 }

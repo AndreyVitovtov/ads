@@ -58,4 +58,31 @@ class ButtonsTelegram {
             ], "{back}"]
         ];
     }
+
+    public function settingsAd() {
+        return [
+            ['{edit_title}', '{edit_description}'],
+            ['{edit_photo}', '{edit_location}'],
+            ['{read_ad}', '{delete_ad}'],
+            ['{back}']
+        ];
+    }
+
+    public function backToSettingsAd() {
+        return [
+            ['{back_to_settings_ad}'],
+            ['{back}']
+        ];
+    }
+
+    public function sendLocationBackToSettingsAd() {
+        return [
+            [[
+                'text' => '{send_location}',
+                'request_location' => true
+            ]],
+            ['{back_to_settings_ad}'],
+            ['{back}']
+        ];
+    }
 }

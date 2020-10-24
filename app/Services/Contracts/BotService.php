@@ -7,11 +7,11 @@ namespace App\Services\Contracts;
 interface BotService {
     function getCountries(int $page, int $count);
     function getCitiesByCountry(int $countryId, int $page, int $count);
-    function getAdsByTitle(string $str);
+    function getAdsByTitle(string $str, int $cityId);
     function getRubrics(int $page, int $count);
     function getSubsectionsByRubric(int $rubricId, int $page, int $count);
     function getAdsBySubsection(int $subsectionId);
-    function getMyAds(int $userId);
+    function getMyAds(int $userId, int $page, int $count);
     function getAdById(int $adId);
     function createAd(array $ad): int;
     function editTitleAd(int $adId, string $title): void;

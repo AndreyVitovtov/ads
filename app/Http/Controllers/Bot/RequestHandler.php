@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Bot;
 
 use App\Http\Controllers\Bot\Traits\RequestHandlerTrait;
+use App\models\Ad;
 use App\models\BotUsers;
 use App\models\buttons\InlineButtons;
 use App\models\City;
@@ -28,18 +29,14 @@ class RequestHandler extends BaseRequestHandler {
             ]);
         }
         elseif(MESSENGER == 'Viber') {
-            $this->send('{select_country}');
-            $countries = $this->botService->getCountries($page, 30);
-            $rows = count($countries) < 7 ? count($countries) : 7;
-            if(Country::count() > count($countries) && $rows != 7) {
-                $rows++;
-            }
+             $this->send('{select_country}');
+             $countries = $this->botService->getCountries($page, 30);
              $this->sendCarusel([
                 'richMedia' => $this->buttons()->countries(
                     $countries,
                     $page
                 ),
-                'rows' => $rows
+                'rows' => count($countries) < 7 ? count($countries) : 7
             ]);
         }
     }
@@ -74,17 +71,15 @@ class RequestHandler extends BaseRequestHandler {
         elseif(MESSENGER == 'Viber') {
             $this->send('{select_city}');
             $cities = $this->botService->getCitiesByCountry($countryId, $page, 30);
-            $rows = count($cities) < 7 ? count($cities) : 7;
-            if(City::count() > count($cities) && $rows != 7) {
-                $rows++;
-            }
+
             $this->sendCarusel([
                 'richMedia' => $this->buttons()->cities(
                     $cities,
                     $countryId,
                     $page
                 ),
-                'rows' => $rows
+                'rows' => count($cities) < 7 ? count($cities) : 7
+
             ]);
         }
     }
@@ -132,7 +127,8 @@ class RequestHandler extends BaseRequestHandler {
 
     public function by_title() {
         $this->send('{send_search_title}', [
-            'buttons' => $this->buttons()->back()
+            'buttons' => $this->buttons()->back(),
+            'input' => 'regular'
         ]);
         $cityId = $this->getCityId();
         $this->setInteraction('search_ads_title', [
@@ -142,8 +138,42 @@ class RequestHandler extends BaseRequestHandler {
 
     public function search_ads_title() {
         $str = $this->getMessage();
-        $this->send($str, [
+        $ads = $this->botService->getAdsByTitle($str, $this->getUser()->cities_id);
+
+        if(empty($ads->toArray())) {
+            $this->send('{no_ads_found}', [
+                'buttons' => $this->buttons()->search_ads()
+            ]);
+        }
+        else {
+            if(MESSENGER == 'Telegram') {
+
+            }
+            else {
+                $this->sendCarusel([
+                    'richMedia' => $this->buttons()->ads($ads),
+                    'buttons' => $this->buttons()->search_ads()
+                ]);
+            }
+        }
+        $this->delInteraction();
+    }
+
+    public function open_ad($id) {
+        $ad = Ad::find($id);
+        $this->sendImage(url('photo_ad/'.$ad->photo), $ad->title, [
             'buttons' => $this->buttons()->back()
+        ]);
+
+        $this->send('{ad_viber}', [
+            'buttons' => $this->buttons()->back()
+        ], [
+            'description' => $ad->description,
+            'phone' => $ad->phone,
+            'city' => $ad->city->name,
+            'rubric' => $ad->subsection->rubric->name,
+            'subsection' => $ad->subsection->name,
+            'date' => $ad->date
         ]);
     }
 
@@ -164,11 +194,13 @@ class RequestHandler extends BaseRequestHandler {
             ]);
         }
         else {
+            $rubrics = $this->botService->getRubrics($page, 30);
             $this->sendCarusel([
                 'richMedia' => $this->buttons()->searchAdsByRurric(
-                    $this->botService->getRubrics($page, 30),
+                    $rubrics,
                     $page
                 ),
+                'rows' => count($rubrics) < 7 ? count($rubrics) : 7,
                 'buttons' => $this->buttons()->back()
             ]);
         }
@@ -194,12 +226,14 @@ class RequestHandler extends BaseRequestHandler {
             ]);
         }
         else {
+            $subsections = $this->botService->getSubsectionsByRubric($rubricId, $page, 30);
             $this->sendCarusel([
                 'richMedia' => $this->buttons()->searchAdsByRubricSubsection(
-                    $this->botService->getSubsectionsByRubric($rubricId, $page, 30),
+                    $subsections,
                     $rubricId,
                     $page
                 ),
+                'rows' => count($subsections) < 7 ? count($subsections) : 7,
                 'buttons' => $this->buttons()->back()
             ]);
         }
@@ -234,11 +268,13 @@ class RequestHandler extends BaseRequestHandler {
             ]);
         }
         else {
+            $rubrics = $this->botService->getRubrics($page, 30);
             $this->sendCarusel([
                 'richMedia' => $this->buttons()->createAdRubric(
-                    $this->botService->getRubrics($page, 30),
+                    $rubrics,
                     $page
                 ),
+                'rows' => count($rubrics) < 7 ? count($rubrics) : 7,
                 'buttons' => $this->buttons()->back()
             ]);
         }
@@ -264,12 +300,14 @@ class RequestHandler extends BaseRequestHandler {
             ]);
         }
         else {
+            $subsections = $this->botService->getSubsectionsByRubric($rubricId, $page, 30);
             $this->sendCarusel([
                 'richMedia' => $this->buttons()->createAdSubsection(
-                    $this->botService->getSubsectionsByRubric($rubricId, $page, 30),
+                    $subsections,
                     $rubricId,
                     $page
                 ),
+                'rows' => count($subsections) < 7 ? count($subsections) : 7,
                 'buttons' => $this->buttons()->back()
             ]);
         }
@@ -421,16 +459,209 @@ class RequestHandler extends BaseRequestHandler {
         }
     }
 
-    public function my_ads() {
-        $ads = $this->botService->getMyAds($this->getUserId());
+    public function my_ads($page = 1) {
+        $page = (int) $page;
+        $ads = $this->botService->getMyAds($this->getUserId(), $page, MESSENGER == 'Telegram' ? 10 : 30);
         if(empty($ads->toArray())) {
-            $this->send('{you_have_no_ads}', [
+            return $this->send('{you_have_no_ads}', [
                 'buttons' => $this->buttons()->main_menu($this->getUserId())
             ]);
         }
 
-        $this->send('{select_ad}', [
-            'buttons' => $this->buttons()->back()
+        if(MESSENGER == "Telegram") {
+            $this->send('{you_ads}', [
+                'inlineButtons' => InlineButtons::myAds(
+                    $ads,
+                    $this->getUserId(),
+                    $page
+                )
+            ]);
+        }
+        else {
+            $myAds = $this->buttons()->myAds(
+                $ads,
+                $this->getUserId(),
+                $page
+            );
+            $this->sendCarusel([
+                'richMedia' => $myAds,
+                'buttons' => $this->buttons()->back(),
+                'rows' => count($myAds) < 7 ? count($myAds) : 7
+            ]);
+        }
+    }
+
+    public function settings_my_ad($id) {
+        if(!is_array($id)) {
+            $this->setInteraction('settings_my_ad', [
+                'id' => $id
+            ]);
+        }
+        else {
+            $id = $id['id'];
+        }
+
+        $this->send('{settings_ad}', [
+            'buttons' => $this->buttons()->settingsAd()
+        ]);
+    }
+
+    public function delete_ad() {
+        $params = $this->getParams();
+        $ad = Ad::find($params->id);
+        if($ad->users_id == $this->getUserId()) {
+            $ad->delete();
+
+            $this->send('{ad_deleted}', [
+                'buttons' => $this->buttons()->main_menu($this->getUserId())
+            ]);
+        }
+        else {
+            $this->send('{error}', [
+                'buttons' => $this->buttons()->main_menu($this->getUserId())
+            ]);
+        }
+    }
+
+    public function edit_title() {
+        $this->send('{send_new_title}', [
+            'buttons' => $this->buttons()->backToSettingsAd(),
+            'input' => 'regular'
+        ]);
+
+        $params = $this->getParams(true);
+        $this->setInteraction('edit_title_send_text', $params);
+    }
+
+    public function edit_title_send_text() {
+        $title = $this->getMessage();
+        $params = $this->getParams();
+        $ad = Ad::find($params->id);
+        $ad->title = $title;
+        $ad->save();
+
+        $this->send('{title_edited}', [
+            'buttons' => $this->buttons()->settingsAd()
+        ]);
+    }
+
+    public function edit_description() {
+        $this->send('{send_new_description}', [
+            'buttons' => $this->buttons()->backToSettingsAd(),
+            'input' => 'regular'
+        ]);
+
+        $params = $this->getParams(true);
+        $this->setInteraction('edit_description_send_text', $params);
+    }
+
+    public function edit_description_send_text() {
+        $description = $this->getMessage();
+        $params = $this->getParams();
+        $ad = Ad::find($params->id);
+        $ad->description = $description;
+        $ad->save();
+
+        $this->send('{description_edited}', [
+            'buttons' => $this->buttons()->settingsAd()
+        ]);
+    }
+
+    public function edit_location() {
+        $this->send('{send_location}', [
+            'buttons' => $this->buttons()->sendLocationBackToSettingsAd()
+        ]);
+
+        $params = $this->getParams(true);
+        $this->setInteraction('edit_location_send_location', $params);
+    }
+
+    public function edit_location_send_location() {
+        if($this->getType() == 'location') {
+            $location = $this->getDataByType();
+            $params = $this->getParams();
+            $ad = Ad::find($params->id);
+            $ad->lat = $location['lat'];
+            $ad->lon = $location['lon'];
+            $ad->save();
+
+            $this->send('{location_edited}', [
+                'buttons' => $this->buttons()->settingsAd()
+            ]);
+        }
+        else {
+            $this->edit_location();
+        }
+    }
+
+    public function edit_photo() {
+        $this->send('{send_photo}', [
+            'buttons' => $this->buttons()->backToSettingsAd(),
+            'input' => 'regular'
+        ]);
+
+        $params = $this->getParams(true);
+        $this->setInteraction('edit_photo_send_photo', $params);
+    }
+
+    public function edit_photo_send_photo() {
+        if($this->getType() == 'photo' || $this->getType() == 'picture') {
+            $path = $this->getFilePath();
+            $fn = $this->botService->savePhoto($path);
+            if($fn) {
+                $params = $this->getParams();
+                $this->botService->editPhotoAd($params->id, $fn);
+
+                $this->send('{photo_edited}', [
+                    'buttons' => $this->buttons()->settingsAd()
+                ]);
+            }
+        }
+        else {
+            $this->edit_photo();
+        }
+    }
+
+    public function read_ad() {
+        $params = $this->getParams();
+        $ad = Ad::find($params->id);
+        if(MESSENGER == 'Telegram') {
+            $this->sendPhoto(url('photo_ad/'.$ad->photo), '{ad_telegram}', [
+                'buttons' => $this->buttons()->settingsAd()
+            ], [
+                'title' => $ad->title,
+                'description' => $ad->description,
+                'phone' => $ad->phone,
+                'city' => $ad->city->name,
+                'rubric' => $ad->subsection->rubric->name,
+                'subsection' => $ad->subsection->name,
+                'date' => $ad->date
+            ]);
+        }
+        else {
+            $this->sendImage(url('photo_ad/'.$ad->photo), $ad->title, [
+                'buttons' => $this->buttons()->settingsAd()
+            ]);
+
+            $this->send('{ad_viber}', [
+                'buttons' => $this->buttons()->settingsAd()
+            ], [
+                'description' => $ad->description,
+                'phone' => $ad->phone,
+                'city' => $ad->city->name,
+                'rubric' => $ad->subsection->rubric->name,
+                'subsection' => $ad->subsection->name,
+                'date' => $ad->date
+            ]);
+        }
+    }
+
+    public function back_to_settings_ad() {
+        $params = $this->getParams(true);
+        $this->setInteraction('settings_my_ad', $params);
+
+        $this->send('{settings_ad}', [
+            'buttons' => $this->buttons()->settingsAd()
         ]);
     }
 
