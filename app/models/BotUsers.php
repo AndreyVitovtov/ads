@@ -27,8 +27,8 @@ class BotUsers extends Model {
         'language'
     ];
 
-    public function chats() {
-        return $this->hasMany(Chat::class, 'users_id');
+    public function ads() {
+        return $this->hasMany(Ad::class, 'users_id');
     }
 
 }

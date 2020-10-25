@@ -71,6 +71,21 @@ class Statistics extends Controller {
             'free' => $accessFree[0]->count
         ];
 
+        //Статистика количество объявлений по странам
+        $ad = DB::select("SELECT country.name, COUNT(ads.id) as count FROM ads
+        JOIN cities ON cities.id = ads.cities_id
+        JOIN country ON country.id = cities.country_id
+        GROUP BY country.name");
+
+        $ads = [];
+        foreach($ad as $a) {
+            $ads[] = [
+                $a->name, $a->count
+            ];
+        }
+
+        $view->ads = $ads;
+
         return $view;
     }
 }

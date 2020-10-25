@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Route;
 //    var_dump($query->sql, $query->bindings);
 //});
 
+//bot/send/mailing - каждые 2 минуты
+//ads/delete/overdue - 1 раз в день (Удалить объявления через определенное время)
+
+
 Route::get('test', "Test@index")->name('test');
 
 
@@ -54,7 +58,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
 
     Route::group(['prefix' => '/mailing', 'middleware' => 'access:mailing'], function () {
         Route::get('/', "Admin\Mailing@index")->name('mailing');
-        Route::post('/send', "Admin\Mailing@send");
+        Route::post('/send', "Admin\Mailing@send")->name('send-mailing');
         Route::post('/cancel', "Admin\Mailing@cancel");
         Route::get('/analize', "Admin\Mailing@analize");
         Route::get('/log', "Admin\Mailing@log");
@@ -147,6 +151,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
             Route::post('/delete', "Admin\AdsController@delete")->name('ads-delete');
             Route::post('/activate', "Admin\AdsController@activate")->name('ads-activate');
             Route::post('/activate/selected', "Admin\AdsController@activateSelected")->name('ads-select-activate');
+            Route::get('/delete/overdue', "Admin\AdsController@deleteOverdue")->name('ads-delete-overdue'); //1 Раз в день (удаление объявлений)
         });
 
         Route::group(['prefix' => 'answers', 'middleware' => 'access:answers'], function () {

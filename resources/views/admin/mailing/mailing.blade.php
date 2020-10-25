@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{asset('css/mailing.css')}}">
 
     <div class="mailing">
-        <form action="/admin/mailing/send" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('send-mailing') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div>
                 <label>@lang('pages.mailing_select_country')</label>
@@ -49,13 +49,13 @@
                 <label>@lang('pages.mailing_ads')</label>
             </div>
             <div>
-                <input type="radio" name="ads_holders" value="all" id="ads_holders_all" checked>
+                <input type="radio" name="with_ads" value="all" id="ads_holders_all" checked>
                 <label for="ads_holders_all">@lang('pages.mailing_all')</label>
 
-                <input type="radio" name="ads_holders" value="yes" id="ads_holders_yes">
+                <input type="radio" name="with_ads" value="yes" id="ads_holders_yes">
                 <label for="ads_holders_yes">@lang('pages.mailing_yes')</label>
 
-                <input type="radio" name="ads_holders" value="no" id="ads_holders_no">
+                <input type="radio" name="with_ads" value="no" id="ads_holders_no">
                 <label for="ads_holders_no">@lang('pages.mailing_no')</label>
             </div>
             <div class="block_buttons">

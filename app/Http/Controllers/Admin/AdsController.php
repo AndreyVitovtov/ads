@@ -8,6 +8,7 @@ use App\models\Country;
 use App\models\Rubric;
 use App\models\Subsection;
 use App\Services\Contracts\AdService;
+use DateTime;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
@@ -98,7 +99,32 @@ class AdsController extends Controller {
     }
 
     public function activateSelected(Request $request) {
-        dd($request->input());
+        $input = $request->input();
+        if(isset($input['ads'])) {
+            foreach($input['ads'] as $ad) {
+                Ad::where('id', $ad)->update(['active' => 1]);
+            }
+        }
+
+        return redirect()->to(route('ads-moderation'));
+    }
+
+    public function deleteOverdue() {
+        $ads = Ad::all();
+
+        foreach($ads as $ad) {
+            if($this->differenceBetweenDates($ad->date) > DELETE_OVERDUE) {
+                Ad::where('id', $ad->id)->delete();
+            }
+        }
+
+    }
+
+    private function differenceBetweenDates($date) {
+        $now = new DateTime(); // текущее время на сервере
+        $date = DateTime::createFromFormat("Y-m-d", $date); // задаем дату в любом формате
+        $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
+        return $interval->d;
     }
 
 }

@@ -17,6 +17,7 @@ return [
     'statistics_messages' => 'Number of messages',
     'statistics_incoming' => 'Incoming',
     'statistics_outgoing' => 'Outgoing',
+    'statistics_count_ads_country' => 'Number of ads by country',
 
     'users' => 'User search',
     'users_search_label' => 'Username or ID Chat',
@@ -67,6 +68,7 @@ return [
     'mailing_count_messages' => 'Count messages',
     'mailing_successfully' => 'Successfully',
     'mailing_not_successful' => 'Not successful',
+    'mailing_ads' => 'With ads',
 
     'countries_add' => 'Add country',
     'countries_country' => 'Country',
@@ -124,6 +126,7 @@ return [
     'ads_delete' => 'Delete',
     'ads_read' => 'Read ad',
     'ads_edit_save' => 'Save',
+    'ads_activate_selected' => 'Activate selected',
 
 
     'analize' => 'Analysis of the latest mailing',

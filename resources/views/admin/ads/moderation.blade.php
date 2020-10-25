@@ -33,7 +33,11 @@
                 @foreach($ads as $ad)
                     <tr>
                         <td>
-                            <input type="checkbox" name="ad[]" value="{{ $ad->id }}" class="checkbox">
+                            <input type="checkbox"
+                                   name="ads[]"
+                                   value="{{ $ad->id }}"
+                                   form="ads_activate_selected"
+                                   class="checkbox">
                         </td>
                         <td>{{ $ad->id }}</td>
                         <td><a href="{{ route('ads-read', $ad->id) }}" class="link">{{ $ad->title }}</a></td>
@@ -71,7 +75,10 @@
                 @endforeach
             </table>
             <br>
-            <button class="button">@lang('pages.ads_activate_selected')</button>
+            <form action="{{ route('ads-select-activate') }}" method="POST" id="ads_activate_selected">
+                @csrf
+                <button class="button">@lang('pages.ads_activate_selected')</button>
+            </form>
         </div>
     </div>
 @endsection

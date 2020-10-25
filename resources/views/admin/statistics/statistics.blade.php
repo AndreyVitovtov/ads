@@ -24,6 +24,7 @@
         texts.users_count = "@lang('pages.statistics_users_count')";
         texts.count_users_country = "@lang('pages.statistics_count_users')";
         texts.count_users_messengers = "@lang('pages.statistics_count_users_messengers')";
+        texts.count_ads_country = "@lang('pages.statistics_count_ads_country')";
 
 
         statistics.data = {!! json_encode($data) !!}
@@ -38,6 +39,11 @@
 
         statistics.data = {!! json_encode($data) !!}
         console.log(statistics);
+
+        statistics4.data = {!! json_encode($ads) !!}
+        console.log(statistics4);
+
+
         {{--statistics4.data = {!! json_encode($access) !!}--}}
         {{--    statistics4.title = "@lang('pages.statistics_access')";--}}
         {{--console.log(statistics4);--}}
@@ -47,7 +53,7 @@
         // по окончанию загрузки API визуализации.
         google.setOnLoadCallback(function() {
 
-            drawChart(statistics, statistics2, statistics3, texts);
+            drawChart(statistics, statistics2, statistics3, statistics4, texts);
         });
     </script>
 

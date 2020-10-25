@@ -72,33 +72,64 @@ class Mailing extends Controller{
 
             $count = 0;
 
-            if($params['chat_holders'] == "all") {
-                $db = DB::select("
-                    SELECT COUNT(*) AS count
-                        FROM users
-                        WHERE messenger LIKE '".$params['messenger']."'
-                            AND country LIKE '".$params['country']."'"
-                );
-            }
-            elseif($params['chat_holders'] == "yes") {
-                $db = DB::select("
+            if($params['with_ads'] == "all") {
+                if($params['country'] == '%') {
+                    $db = DB::select("
                     SELECT COUNT(DISTINCT(u.id)) AS count
                         FROM users u
-                        JOIN chats c ON c.users_id = u.id
+                        WHERE u.messenger LIKE '".$params['messenger']."'"
+                    );
+                }
+                else {
+                    $db = DB::select("
+                    SELECT COUNT(DISTINCT(u.id)) AS count
+                        FROM users u
                         WHERE u.messenger LIKE '".$params['messenger']."'
                             AND u.country LIKE '".$params['country']."'"
-                );
+                    );
+                }
             }
-            elseif($params['chat_holders'] == "no") {
-                $db = DB::select("
+            elseif($params['with_ads'] == "yes") {
+                if($params['country'] == '%') {
+                    $db = DB::select("
                     SELECT COUNT(DISTINCT(u.id)) AS count
-                    FROM users u
-                    WHERE u.id NOT IN (
-                        SELECT id FROM chats
-                    ) AND u.messenger LIKE '".$params['messenger']."'
-                      AND u.country LIKE '".$params['country']."'"
-                );
-
+                        FROM users u
+                        JOIN ads a ON u.id = a.users_id
+                        WHERE u.messenger LIKE '".$params['messenger']."'
+                            AND a.id != 0"
+                    );
+                }
+                else {
+                    $db = DB::select("
+                    SELECT COUNT(DISTINCT(u.id)) AS count
+                        FROM users u
+                        JOIN ads a ON u.id = a.users_id
+                        WHERE u.messenger LIKE '".$params['messenger']."'
+                            AND u.country LIKE '".$params['country']."'
+                            AND a.id != 0"
+                    );
+                }
+            }
+            elseif($params['with_ads'] == "no") {
+                if($params['country'] == '%') {
+                    $db = DB::select("
+                        SELECT COUNT(DISTINCT(u.id)) AS count
+                        FROM users u
+                        WHERE u.id NOT IN (
+                            SELECT users_id FROM ads
+                        ) AND u.messenger LIKE '".$params['messenger']."'"
+                    );
+                }
+                else {
+                    $db = DB::select("
+                        SELECT COUNT(DISTINCT(u.id)) AS count
+                        FROM users u
+                        WHERE u.id NOT IN (
+                            SELECT users_id FROM ads
+                        ) AND u.messenger LIKE '".$params['messenger']."'
+                          AND u.country LIKE '".$params['country']."'"
+                    );
+                }
             }
 
             $count = $db[0]->count;
@@ -113,18 +144,18 @@ class Mailing extends Controller{
             $task['performed'] = "false";
             $task['country'] = $params['country'];
             $task['messenger'] = $params['messenger'];
-            $task['chat_holders'] = $params['chat_holders'];
+            $task['with_ads'] = $params['with_ads'];
 
             file_put_contents(public_path()."/json/mailing_task.json", json_encode($task));
             file_put_contents(public_path()."/txt/log.txt", "");
 
-            return redirect()->to("/admin/mailing/users");
+            return redirect()->to(route('mailing'));
         }
     }
 
     public function cancel() {
         unlink(public_path()."/json/mailing_task.json");
-        return redirect()->to("/admin/mailing/users");
+        return redirect()->to(route('mailing'));
     }
 
     public function analize() {

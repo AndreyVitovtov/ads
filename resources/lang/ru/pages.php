@@ -17,6 +17,7 @@ return [
     'statistics_messages' => 'Количество сообщений',
     'statistics_incoming' => 'Входящие',
     'statistics_outgoing' => 'Исходяшие',
+    'statistics_count_ads_country' => 'Количество объявлений по странам',
 
     'users' => 'Поиск пользователей',
     'users_search_label' => 'Имя пользователя или ID Chat',
@@ -67,6 +68,7 @@ return [
     'mailing_count_messages' => 'Количество сообщений',
     'mailing_successfully' => 'Успешно',
     'mailing_not_successful' => 'Не успешно',
+    'mailing_ads' => 'С объявлениями',
 
     'countries_add' => 'Добавить страну',
     'countries_country' => 'Страна',
@@ -124,6 +126,7 @@ return [
     'ads_delete' => 'Удалить',
     'ads_read' => 'Просмотр объявления',
     'ads_edit_save' => 'Сохранить',
+    'ads_activate_selected' => 'Активировать выбранные',
 
     'analize' => 'Анализ последней рассылки',
     'analize_mark_inactive_users' => 'Отметить неактивных пользователей',

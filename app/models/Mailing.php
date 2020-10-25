@@ -33,38 +33,77 @@ class Mailing {
             'message' => 'Mailing performed'
         ]);
 
-        if($task->chat_holders == "all") {
-            $users = DB::select("
-                    SELECT id, chat, messenger 
-                    FROM users 
-                    WHERE messenger LIKE '".$task->messenger."' 
+        if($task->with_ads == "all") {
+            if($task->country == '%') {
+                $users = DB::select("
+                    SELECT id, chat, messenger
+                    FROM users
+                    WHERE messenger LIKE '".$task->messenger."'
+                    LIMIT ".$this->countUsers."
+                    OFFSET ".$task->start
+                );
+            }
+            else {
+                $users = DB::select("
+                    SELECT id, chat, messenger
+                    FROM users
+                    WHERE messenger LIKE '".$task->messenger."'
                     AND country LIKE '".$task->country."'
                     LIMIT ".$this->countUsers."
                     OFFSET ".$task->start
-            );
+                );
+            }
+
         }
-        elseif($task->chat_holders == "yes") {
-            $users = DB::select("
+        elseif($task->with_ads == "yes") {
+            if($task->country == '%') {
+                $users = DB::select("
                     SELECT id, chat, messenger
                         FROM users u
-                        JOIN chats c ON c.users_id = u.id
+                        JOIN ads a ON a.users_id = u.id
                         WHERE u.messenger LIKE '".$task->messenger."'
-                        AND u.country LIKE '".$task->country."'
+                        AND a.id != 0
                         LIMIT ".$this->countUsers."
                         OFFSET ".$task->start
-            );
+                );
+            }
+            else {
+                $users = DB::select("
+                    SELECT id, chat, messenger
+                        FROM users u
+                        JOIN ads a ON a.users_id = u.id
+                        WHERE u.messenger LIKE '".$task->messenger."'
+                        AND u.country LIKE '".$task->country."'
+                        AND a.id != 0
+                        LIMIT ".$this->countUsers."
+                        OFFSET ".$task->start
+                );
+            }
         }
-        elseif($task->chat_holders == "no") {
-            $db = DB::select("
-                    SELECT id, chat, messenger 
+        elseif($task->with_ads == "no") {
+            if($task->country == '%') {
+                $users = DB::select("
+                    SELECT id, chat, messenger
                     FROM users u
                     WHERE u.id NOT IN (
-                        SELECT id FROM chats
+                        SELECT users_id FROM ads
+                    ) AND u.messenger LIKE '".$task->messenger."'
+                    LIMIT ".$this->countUsers."
+                    OFFSET ".$task->start
+                );
+            }
+            else {
+                $users = DB::select("
+                    SELECT id, chat, messenger
+                    FROM users u
+                    WHERE u.id NOT IN (
+                        SELECT users_id FROM ads
                     ) AND u.messenger LIKE '".$task->messenger."'
                       AND u.country LIKE '".$task->country."'
                     LIMIT ".$this->countUsers."
                     OFFSET ".$task->start
-            );
+                );
+            }
         }
 
         $task->performed = "true";
