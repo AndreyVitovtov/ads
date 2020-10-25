@@ -376,4 +376,11 @@ class InlineButtons {
         return $buttons;
     }
 
+    public static function ads($id) {
+        return [[[
+            'text' => '{open_ad}',
+            'callback_data' => 'open_ad__'.$id
+        ]]];
+    }
+
 }

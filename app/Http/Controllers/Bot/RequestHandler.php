@@ -146,7 +146,15 @@ class RequestHandler extends BaseRequestHandler {
         }
         else {
             if(MESSENGER == 'Telegram') {
-                $this->send('');
+                $this->send('{ads_found}', [
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                foreach($ads[0] as $ad) {
+                    $this->sendPhoto(url('photo_ad/'.$ad['photo']), $ad['title'], [
+                        'inlineButtons' => InlineButtons::ads($ad['id'])
+                    ]);
+                }
             }
             else {
                 $this->sendCarusel([
@@ -164,20 +172,36 @@ class RequestHandler extends BaseRequestHandler {
 
     public function open_ad($id) {
         $ad = Ad::find($id);
-        $this->sendImage(url('photo_ad/'.$ad->photo), $ad->title, [
-            'buttons' => $this->buttons()->back()
-        ]);
 
-        $this->send('{ad_viber}', [
-            'buttons' => $this->buttons()->back()
-        ], [
-            'description' => $ad->description,
-            'phone' => $ad->phone,
-            'city' => $ad->city->name,
-            'rubric' => $ad->subsection->rubric->name,
-            'subsection' => $ad->subsection->name,
-            'date' => $ad->date
-        ]);
+        if(MESSENGER == 'Telegram') {
+            $this->sendPhoto(url('photo_ad/'.$ad->photo), '{ad_telegram}', [
+                'buttons' => $this->buttons()->back()
+            ], [
+                'title' => $ad->title,
+                'description' => $ad->description,
+                'phone' => $ad->phone,
+                'city' => $ad->city->name,
+                'rubric' => $ad->subsection->rubric->name,
+                'subsection' => $ad->subsection->name,
+                'date' => $ad->date
+            ]);
+        }
+        else {
+            $this->sendImage(url('photo_ad/'.$ad->photo), $ad->title, [
+                'buttons' => $this->buttons()->back()
+            ]);
+
+            $this->send('{ad_viber}', [
+                'buttons' => $this->buttons()->back()
+            ], [
+                'description' => $ad->description,
+                'phone' => $ad->phone,
+                'city' => $ad->city->name,
+                'rubric' => $ad->subsection->rubric->name,
+                'subsection' => $ad->subsection->name,
+                'date' => $ad->date
+            ]);
+        }
     }
 
     public function by_rubric($page = 1) {
@@ -253,7 +277,15 @@ class RequestHandler extends BaseRequestHandler {
         }
         else {
             if(MESSENGER == 'Telegram') {
-                $this->send('');
+                $this->send('{ads_found}', [
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                foreach($ads[0] as $ad) {
+                    $this->sendPhoto(url('photo_ad/'.$ad['photo']), $ad['title'], [
+                        'inlineButtons' => InlineButtons::ads($ad['id'])
+                    ]);
+                }
             }
             else {
                 $this->sendCarusel([
@@ -280,9 +312,61 @@ class RequestHandler extends BaseRequestHandler {
     public function search_ads_locality() {
         if($this->getType() == 'location') {
             $loc = $this->getDataByType();
-            $this->send($loc['lat'].", ".$loc['lon'], [
-                'buttons' => $this->buttons()->back()
-            ]);
+
+            $max_distance = 20;
+            $latitude = $loc['lat'];
+            $longitude = $loc['lon'];
+
+            $R = 6371;  // earth's radius, km
+            // first-cut bounding box (in degrees)
+            $max_latitude = $latitude + rad2deg($max_distance/$R);
+            $min_latitude = $latitude - rad2deg($max_distance/$R);
+            // compensate for degrees longitude getting smaller with increasing latitude
+            $max_longitude = $longitude + rad2deg($max_distance/$R/cos(deg2rad($latitude)));
+            $min_longitude = $longitude - rad2deg($max_distance/$R/cos(deg2rad($latitude)));
+
+            $ads = Ad::where('cities_id', 1)
+                ->where('lat', '>', $min_latitude)
+                ->where('lat', '<', $max_latitude)
+                ->where('lon', '>', $min_longitude)
+                ->where('lon', '<', $max_longitude)
+                ->get();
+
+            $ads = array_chunk($ads->toArray(), 10);
+
+            if(empty($ads[0])) {
+                $this->send('{no_ads_found}', [
+                    'buttons' => $this->buttons()->search_ads()
+                ]);
+            }
+            else {
+                if(MESSENGER == 'Telegram') {
+                    $this->send('{ads_found}', [
+                        'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                    ]);
+
+                    foreach($ads[0] as $ad) {
+                        $this->sendPhoto(url('photo_ad/'.$ad['photo']), $ad['title'], [
+                            'inlineButtons' => InlineButtons::ads($ad['id'])
+                        ]);
+                    }
+                }
+                else {
+                    $this->sendCarusel([
+                        'richMedia' => $this->buttons()->ads($ads[0]),
+                        'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                    ]);
+                }
+                $this->setInteraction('', [
+                    'page' => 1,
+                    'type' => 'search_ads_location',
+                    'loc' => $loc,
+                    'min_latitude' => $min_latitude,
+                    'max_latitude' => $max_latitude,
+                    'min_longitude' => $min_longitude,
+                    'max_longitude' => $max_longitude
+                ]);
+            }
         }
     }
 
@@ -290,44 +374,98 @@ class RequestHandler extends BaseRequestHandler {
         $params = $this->getParams();
 
         if($params->type == 'search_ads_title') {
-            if(MESSENGER == "Telegram") {
+            $ads = $this->botService->getAdsByTitle($params->str, $this->getUser()->cities_id);
+            $ads = array_chunk($ads->toArray(), 10);
 
+            if(MESSENGER == "Telegram") {
+                $this->send('{ads_found}', [
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                foreach($ads[0] as $ad) {
+                    $this->sendPhoto(url('photo_ad/'.$ad['photo']), $ad['title'], [
+                        'inlineButtons' => InlineButtons::ads($ad['id'])
+                    ]);
+                }
             }
             else {
-                $ads = $this->botService->getAdsByTitle($params->str, $this->getUser()->cities_id);
-                $ads = array_chunk($ads->toArray(), 10);
-
                 $this->sendCarusel([
                     'richMedia' => $this->buttons()->ads($ads[$params->page]),
                     'buttons' => isset($ads[$params->page+1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
                 ]);
-
-                $this->setInteraction('', [
-                    'page' => $params->page+1,
-                    'type' => 'search_ads_title',
-                    'str' => $params->str
-                ]);
             }
+
+            $this->setInteraction('', [
+                'page' => $params->page+1,
+                'type' => 'search_ads_title',
+                'str' => $params->str
+            ]);
         }
         elseif($params->type == 'search_ads_rubric') {
-            if(MESSENGER == "Telegram") {
+            $ads = $this->botService->getAdsBySubsection($params->subsection_id, $this->getUser()->cities_id);
+            $ads = array_chunk($ads->toArray(), 10);
 
+            if(MESSENGER == "Telegram") {
+                $this->send('{ads_found}', [
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                foreach($ads[0] as $ad) {
+                    $this->sendPhoto(url('photo_ad/'.$ad['photo']), $ad['title'], [
+                        'inlineButtons' => InlineButtons::ads($ad['id'])
+                    ]);
+                }
             }
             else {
-                $ads = $this->botService->getAdsBySubsection($params->subsection_id, $this->getUser()->cities_id);
-                $ads = array_chunk($ads->toArray(), 10);
-
                 $this->sendCarusel([
                     'richMedia' => $this->buttons()->ads($ads[$params->page]),
                     'buttons' => isset($ads[$params->page+1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
                 ]);
+            }
 
-                $this->setInteraction('', [
-                    'page' => $params->page+1,
-                    'type' => 'search_ads_rubric',
-                    'subsection_id' => $params->subsection_id
+            $this->setInteraction('', [
+                'page' => $params->page+1,
+                'type' => 'search_ads_rubric',
+                'subsection_id' => $params->subsection_id
+            ]);
+        }
+        elseif($params->type == 'search_ads_location') {
+            $ads = Ad::where('cities_id', 1)
+                ->where('lat', '>', $params->min_latitude)
+                ->where('lat', '<', $params->max_latitude)
+                ->where('lon', '>', $params->min_longitude)
+                ->where('lon', '<', $params->max_longitude)
+                ->get();
+
+            $ads = array_chunk($ads->toArray(), 10);
+
+            if(MESSENGER == "Telegram") {
+                $this->send('{ads_found}', [
+                    'buttons' => isset($ads[1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
+                ]);
+
+                foreach($ads[0] as $ad) {
+                    $this->sendPhoto(url('photo_ad/'.$ad['photo']), $ad['title'], [
+                        'inlineButtons' => InlineButtons::ads($ad['id'])
+                    ]);
+                }
+            }
+            else {
+                $this->sendCarusel([
+                    'richMedia' => $this->buttons()->ads($ads[$params->page]),
+                    'buttons' => isset($ads[$params->page+1]) ? $this->buttons()->moreBack() : $this->buttons()->back()
                 ]);
             }
+
+            $this->setInteraction('', [
+                'page' => $params->page+1,
+                'type' => 'search_ads_location',
+                'loc' => $params->loc,
+                'min_latitude' => $params->min_latitude,
+                'max_latitude' => $params->max_latitude,
+                'min_longitude' => $params->min_longitude,
+                'max_longitude' => $params->max_longitude
+            ]);
         }
     }
 

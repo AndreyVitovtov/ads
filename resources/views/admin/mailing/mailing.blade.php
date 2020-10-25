@@ -46,17 +46,17 @@
             </div>
             <br>
             <div>
-                <label>@lang('pages.mailing_chat_holders')</label>
+                <label>@lang('pages.mailing_ads')</label>
             </div>
             <div>
-                <input type="radio" name="chat_holders" value="all" id="chat_holders_all" checked>
-                <label for="chat_holders_all">@lang('pages.mailing_all')</label>
+                <input type="radio" name="ads_holders" value="all" id="ads_holders_all" checked>
+                <label for="ads_holders_all">@lang('pages.mailing_all')</label>
 
-                <input type="radio" name="chat_holders" value="yes" id="chat_holders_yes">
-                <label for="chat_holders_yes">@lang('pages.mailing_yes')</label>
+                <input type="radio" name="ads_holders" value="yes" id="ads_holders_yes">
+                <label for="ads_holders_yes">@lang('pages.mailing_yes')</label>
 
-                <input type="radio" name="chat_holders" value="no" id="chat_holders_no">
-                <label for="chat_holders_no">@lang('pages.mailing_no')</label>
+                <input type="radio" name="ads_holders" value="no" id="ads_holders_no">
+                <label for="ads_holders_no">@lang('pages.mailing_no')</label>
             </div>
             <div class="block_buttons">
                 <button class="button">@lang('pages.mailing_send')</button>

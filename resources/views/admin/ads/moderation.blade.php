@@ -23,7 +23,7 @@
         <div>
             <table>
                 <tr>
-{{--                    <td></td>--}}
+                    <td><input type="checkbox" name="check_all" id="check_all"></td>
                     <td>ID</td>
                     <td>@lang('pages.ads_title')</td>
                     <td>@lang('pages.ads_rubric')</td>
@@ -32,9 +32,9 @@
                 </tr>
                 @foreach($ads as $ad)
                     <tr>
-{{--                        <td>--}}
-{{--                            <input type="checkbox" name="ad_[{{ $ad->id }}]" value="{{ $ad->id }}">--}}
-{{--                        </td>--}}
+                        <td>
+                            <input type="checkbox" name="ad[]" value="{{ $ad->id }}" class="checkbox">
+                        </td>
                         <td>{{ $ad->id }}</td>
                         <td><a href="{{ route('ads-read', $ad->id) }}" class="link">{{ $ad->title }}</a></td>
                         <td>{{ $ad->subsection->rubric->name }}</td>
@@ -70,6 +70,8 @@
                     </tr>
                 @endforeach
             </table>
+            <br>
+            <button class="button">@lang('pages.ads_activate_selected')</button>
         </div>
     </div>
 @endsection

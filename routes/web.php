@@ -146,6 +146,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
             Route::post('/edit/save', "Admin\AdsController@editSave")->name('ads-edit-save');
             Route::post('/delete', "Admin\AdsController@delete")->name('ads-delete');
             Route::post('/activate', "Admin\AdsController@activate")->name('ads-activate');
+            Route::post('/activate/selected', "Admin\AdsController@activateSelected")->name('ads-select-activate');
         });
 
         Route::group(['prefix' => 'answers', 'middleware' => 'access:answers'], function () {

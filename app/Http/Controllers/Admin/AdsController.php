@@ -97,4 +97,8 @@ class AdsController extends Controller {
         }
     }
 
+    public function activateSelected(Request $request) {
+        dd($request->input());
+    }
+
 }

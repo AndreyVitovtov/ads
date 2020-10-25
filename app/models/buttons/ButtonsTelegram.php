@@ -34,10 +34,7 @@ class ButtonsTelegram {
     public function search_ads() {
         return [
             ["{by_title}", "{by_rubric}"],
-            [[
-                'text' => '{closest_to_me}',
-                'request_location' => true
-            ], "{back}"]
+            ["{closest_to_me}", "{back}"]
         ];
     }
 
@@ -82,6 +79,13 @@ class ButtonsTelegram {
                 'request_location' => true
             ]],
             ['{back_to_settings_ad}'],
+            ['{back}']
+        ];
+    }
+
+    public function moreBack() {
+        return [
+            ['{more}'],
             ['{back}']
         ];
     }
