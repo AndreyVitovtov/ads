@@ -74,6 +74,7 @@ Route::group(['middleware' => 'auth', 'prefix'=>'admin'], function() {
         Route::post('/count/chat', "Admin\Users@countChat")->name('user-count-chat');
         Route::post('/count/mailing', "Admin\Users@countMailing")->name('user-count-mailing');
         Route::post('/send/message', "Admin\Users@sendMessage")->name('user-send-message');
+        Route::get('/profile/{id}/referrals', "Admin\Users@referrals")->name('user-referrals');
     });
 
     Route::group(['prefix' => 'countries', 'middleware' => 'access:countries'], function () {

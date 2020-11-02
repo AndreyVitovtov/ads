@@ -31,4 +31,8 @@ class BotUsers extends Model {
         return $this->hasMany(Ad::class, 'users_id');
     }
 
+    public function ref() {
+        return $this->hasMany(RefSystem::class, 'referrer');
+    }
+
 }

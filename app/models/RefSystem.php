@@ -13,4 +13,8 @@ class RefSystem extends Model {
         'date',
         'time'
     ];
+
+    public function user() {
+        return $this->belongsTo(BotUsers::class, 'referral');
+    }
 }

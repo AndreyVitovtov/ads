@@ -54,8 +54,20 @@
                 <td>{{ $profile->username }}</td>
             </tr>
             <tr>
-                <td>ID Chat:</td>
+                <td>ID Chat</td>
                 <td>{{ $profile->chat }}</td>
+            </tr>
+            <tr>
+                <td>@lang('pages.users_messenger')</td>
+                <td>{{ $profile->messenger }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="{{ route('user-referrals', $profile->id) }}" class="link">@lang('pages.users_referrals')</a>
+                </td>
+                <td>
+                    <a href="{{ route('user-referrals', $profile->id) }}" class="link">{{ $profile->ref->count() }}</a>
+                </td>
             </tr>
             <tr>
                 <td>@lang('pages.users_date')</td>

@@ -37,6 +37,8 @@ return [
     'users_count_mailing' => 'Count mailing',
     'users_send' => 'Send',
     'users_message' => 'Message',
+    'users_referrals' => 'Referrals',
+    'users_messenger' => 'Messenger',
 
     'chats' => 'Chats',
     'chats_name' => 'Chat name',

@@ -122,4 +122,11 @@ class Users extends Controller {
         return redirect()->to(url('admin/users/profile/'.$request->post('id')));
     }
 
+    public function referrals($id) {
+        return view('admin.users.referrals', [
+            'profile' => BotUsers::find($id),
+            'menuItem' => "users"
+        ]);
+    }
+
 }

@@ -313,7 +313,7 @@ class RequestHandler extends BaseRequestHandler {
         if($this->getType() == 'location') {
             $loc = $this->getDataByType();
 
-            $max_distance = 20;
+            $max_distance = MAX_DISTANCE_CLOSEST_TO_ME;
             $latitude = $loc['lat'];
             $longitude = $loc['lon'];
 

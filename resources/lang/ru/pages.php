@@ -37,6 +37,8 @@ return [
     'users_count_mailing' => 'Количество рассылок',
     'users_send' => 'Отправить',
     'users_message' => 'Сообщение',
+    'users_referrals' => 'Реферралы',
+    'users_messenger' => 'Мессенджер',
 
     'chats' => 'Чаты',
     'chats_name' => 'Название чата',
