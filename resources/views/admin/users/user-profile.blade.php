@@ -51,7 +51,11 @@
             </tr>
             <tr>
                 <td>@lang('pages.users_username')</td>
-                <td>{{ $profile->username }}</td>
+                <td>
+                    @if($profile->unsubscribed == 1)
+                        ❌
+                    @endif{{ $profile->username }}
+                </td>
             </tr>
             <tr>
                 <td>ID Chat</td>
@@ -107,11 +111,19 @@
                     <label for="message">@lang('pages.users_message')</label>
                 </div>
                 <div>
-                    <textarea name="message" id="message"></textarea>
+                    <textarea name="message" id="message"
+                        @if($profile->unsubscribed == 1)
+                            disabled
+                        @endif
+                    ></textarea>
                 </div>
                 <br>
                 <div>
-                    <input type="submit" value="@lang('pages.users_send')" class="button">
+                    <input type="submit" value="@lang('pages.users_send')" class="button"
+                       @if($profile->unsubscribed == 1)
+                           disabled
+                       @endif
+                    >
                 </div>
             </form>
         </div>

@@ -114,6 +114,12 @@ trait RequestHandlerTrait {
 //        ]);
     }
 
+    public function unsubscribed() {
+        $user = $this->getUser();
+        $user->unsubscribed = 1;
+        $user->save();
+    }
+
     public function languages() {
         if(MESSENGER == "Viber") {
             $languages = Language::all();

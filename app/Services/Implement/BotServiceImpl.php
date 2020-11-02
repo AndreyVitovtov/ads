@@ -47,6 +47,7 @@ class BotServiceImpl implements BotService {
     function getAdsBySubsection(int $subsectionId, int $cityId) {
         return Ad::where('subsection_id', $subsectionId)
             ->where('cities_id', $cityId)
+            ->where('active', 1)
             ->get();
     }
 

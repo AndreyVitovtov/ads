@@ -81,3 +81,8 @@ textarea {
     border: solid 1px #C3C3C3;
     border-radius: 3px;
 }
+
+.unsubscribed {
+    background-color: rgb(255, 131, 123) !important;
+    color: #fff;
+}

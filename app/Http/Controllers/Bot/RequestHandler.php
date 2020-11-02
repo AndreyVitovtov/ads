@@ -330,6 +330,7 @@ class RequestHandler extends BaseRequestHandler {
                 ->where('lat', '<', $max_latitude)
                 ->where('lon', '>', $min_longitude)
                 ->where('lon', '<', $max_longitude)
+                ->where('active', 1)
                 ->get();
 
             $ads = array_chunk($ads->toArray(), 10);
@@ -435,6 +436,7 @@ class RequestHandler extends BaseRequestHandler {
                 ->where('lat', '<', $params->max_latitude)
                 ->where('lon', '>', $params->min_longitude)
                 ->where('lon', '<', $params->max_longitude)
+                ->where('active', 1)
                 ->get();
 
             $ads = array_chunk($ads->toArray(), 10);
@@ -716,13 +718,19 @@ class RequestHandler extends BaseRequestHandler {
     }
 
     public function settings_my_ad($id) {
-        if(!is_array($id)) {
-            $this->setInteraction('settings_my_ad', [
-                'id' => $id
+        if(is_array($id)) {
+            $id = $id['id'];
+        }
+
+        if(! Ad::where('id', $id)->exists()) {
+            return $this->send('{no_ads_found}', [
+                'buttons' => $this->buttons()->main_menu($this->getUserId())
             ]);
         }
         else {
-            $id = $id['id'];
+            $this->setInteraction('settings_my_ad', [
+                'id' => $id
+            ]);
         }
 
         $this->send('{settings_ad}', [

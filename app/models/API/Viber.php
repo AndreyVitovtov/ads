@@ -27,7 +27,10 @@ namespace app\models\API;
                 return $this->request->sender->id;
             } elseif (isset($this->request->user->id)) {
                 return $this->request->user->id;
-            } else {
+            } elseif (isset($this->request->user_id)) {
+                return $this->request->user_id;
+            }
+            else {
                 return null;
             }
         }

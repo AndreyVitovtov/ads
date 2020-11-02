@@ -32,9 +32,15 @@
             <td>@lang('pages.users_profile')</td>
         </tr>
         @foreach($users as $user)
-            <tr>
+            <tr
+            @if($user->unsubscribed == 1)
+                class="unsubscribed"
+            @endif
+            >
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $user['chat'] }}</td>
+                <td>
+                    {{ $user['chat'] }}
+                </td>
                 <td>{{ $user['username'] }}</td>
                 <td>{{ $user['date'] }} {{ $user['time'] }}</td>
                 <td class="actions">

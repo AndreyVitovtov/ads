@@ -157,11 +157,15 @@ trait Universal {
     private function getTypeReq($arrProperties = null):? string {
         if($this->messenger == "Viber") {
             $req = json_decode($this->getRequest());
+
             if(isset($req->message->type)) {
                 return $req->message->type; //text, picture
             }
             if($req->event == "conversation_started") {
                 return "started";
+            }
+            if($req->event == "unsubscribed") {
+                return "unsubscribed";
             }
             return null;
         }
@@ -209,7 +213,6 @@ trait Universal {
     public function getDataByType() {
         $request = json_decode($this->getRequest());
         if($this->messenger == "Viber") {
-
             if (empty($request)) return null;
             if ($this->type == "text") {
                 $data = [
@@ -427,8 +430,11 @@ trait Universal {
             elseif ($this->type == "location") {
                 return "location";
             }
-            elseif ($this->getType() == "contact") {
+            elseif ($this->type == "contact") {
                 return "contact";
+            }
+            elseif ($this->type == "unsubscribed") {
+                return "unsubscribed";
             }
             else {
                 return null;

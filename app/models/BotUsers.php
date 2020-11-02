@@ -24,7 +24,8 @@ class BotUsers extends Model {
         'start',
         'count_ref',
         'access_free',
-        'language'
+        'language',
+        'unsubscribed'
     ];
 
     public function ads() {
