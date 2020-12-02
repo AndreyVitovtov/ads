@@ -20,7 +20,7 @@ class CountryServiceImpl implements CountryService {
             $country->save();
 
             $city = new City();
-            $city->name = "Любой город";
+            $city->name = ANY_CITY;
             $city->country_id = $country->id;
             $city->save();
 

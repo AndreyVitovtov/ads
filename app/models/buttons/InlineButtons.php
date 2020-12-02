@@ -119,12 +119,12 @@ class InlineButtons {
 
         $nextPage = [
             'text' => '{next_page}',
-            'callback_data' => 'select_countries__'.$np
+            'callback_data' => 'select_country__'.$np
         ];
 
         $prevPage = [
             'text' => '{prev_page}',
-            'callback_data' => 'select_countries__'.$pp
+            'callback_data' => 'select_country__'.$pp
         ];
 
         $buttons = [];
